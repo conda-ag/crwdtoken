@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/capacitybox/conda"
+    "url": "https://github.com/conda-ag/crwdtoken"
   },
   "keywords": [
     "solidity",
@@ -28,9 +28,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://bitbucket.org/capacitybox/conda"
+    "url": "https://github.com/conda-ag/crwdtoken"
   },
-  "homepage": "https://bitbucket.org/capacitybox/conda",
+  "homepage": "https://conda.online/",
   "dependencies": {
     "truffle-hdwallet-provider": "0.0.3",
     "truffle-test-helpers": "0.0.4"
