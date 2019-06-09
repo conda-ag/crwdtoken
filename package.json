@@ -24,7 +24,8 @@
   ],
   "author": [
     "Andreas Petersson <andreas@capacity.at>",
-    "Robert Kaiser <robert@capacity.at>"
+    "Robert Kaiser <robert@capacity.at>",
+    "Johannes Mayer <johannes.mayer@conda.at>"
   ],
   "license": "MIT",
   "bugs": {
