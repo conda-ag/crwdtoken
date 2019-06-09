@@ -4,7 +4,7 @@
   "description": "CrwdToken Smart Contract",
   "main": "truffle.js",
   "scripts": {
-    "test": "scripts/test.sh",
+    "test": "./node_modules/.bin/truffle test",
     "console": "truffle console",
     "coverage": "scripts/coverage.sh",
     "coveralls": "scripts/coveralls.sh"
