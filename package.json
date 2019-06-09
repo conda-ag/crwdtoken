@@ -1,5 +1,5 @@
 {
-  "name": "CrwdToken-contract",
+  "name": "crwdtoken-contract",
   "version": "0.8.0",
   "description": "CrwdToken Smart Contract",
   "main": "truffle.js",
