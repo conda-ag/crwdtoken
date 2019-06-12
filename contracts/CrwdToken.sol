@@ -176,7 +176,7 @@ contract CrwdToken is StandardToken {
     }
 
     function addBonus(uint256 basisTokens)
-    public constant
+    public view
     returns (uint256 resultingTokens)
     {
         //if pre-sale is not active no bonus calculation
@@ -203,7 +203,7 @@ contract CrwdToken is StandardToken {
 
     function getPhaseBonus()
     internal
-    constant
+    view
     returns (uint256 factor)
     {
         if (bonusPhase) {//20%
@@ -398,7 +398,7 @@ contract CrwdToken is StandardToken {
 
     function balanceOf(address _account)
     public
-    constant
+    view
     returns (uint256 balance) {
         return balances[_account];
     }
