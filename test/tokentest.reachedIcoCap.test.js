@@ -101,7 +101,7 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
       currentBalance.should.be.bignumber.equal(postBalance);
     }
     const postBalance = web3.eth.getBalance(theToken.address);
-    let remaining = new BigNumber(weiICOMaximum).minus(postBalance);
+    let remaining = new BigNumber(weiICOMaximum).sub(postBalance);
     let aBitTooMuch = remaining.plus(web3.toWei("0.001", "ether"));
     await theToken.sendTransaction({ from: user1, value: aBitTooMuch }).should.be.rejected;
     await theToken.sendTransaction({ from: user1, value: remaining }).should.not.be.rejected;

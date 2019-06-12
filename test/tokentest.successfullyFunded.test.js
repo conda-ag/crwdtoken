@@ -276,7 +276,7 @@ contract('Token funded', function (accounts) {
     (await theToken.soldTokens()).should.be.bignumber.equal(soldBefore.plus(presaleAmount));
     (await theToken.totalSupply()).should.be.bignumber.equal(totalBefore.plus(presaleAmount.times(100).div(await theToken.percentForSale())));
     // addPresaleAmount should not allow integer overflow! We try with a value that would overflow to 1
-    const targetedHugeAmount = (new BigNumber("2")).pow(256).minus(balanceBefore.plus(presaleAmount)).plus(1);
+    const targetedHugeAmount = (new BigNumber("2")).pow(256).sub(balanceBefore.plus(presaleAmount)).plus(1);
     await reverting(theToken.addPresaleAmount(user2, targetedHugeAmount, { from: expectedTokenAssignmentControl }));
     (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.plus(presaleAmount));
   });
@@ -300,7 +300,7 @@ contract('Token funded', function (accounts) {
     // make sure another investment works before the time jump, after which it is rejected.
     const investAmount = web3.toWei("0.001", "ether");
     await theToken.sendTransaction({ from: user1, value: investAmount }).should.not.be.rejected;
-    web3.eth.getBalance(theToken.address).should.be.bignumber.below((new BigNumber(weiICOMaximum)).minus(investAmount));
+    web3.eth.getBalance(theToken.address).should.be.bignumber.below((new BigNumber(weiICOMaximum)).sub(investAmount));
     await advanceToBlock(endBlock + 1);
     await theToken.sendTransaction({ from: user1, value: investAmount }).should.be.rejectedWith(revert);
   });
@@ -361,8 +361,8 @@ contract('Token funded', function (accounts) {
     const callResult = await theToken.requestPayout(withdrawAmount, { from: expectedWithdraw }).should.not.be.rejected;
     const tx = await web3.eth.getTransaction(callResult.tx);
     const txCost = tx.gasPrice.times(callResult.receipt.gasUsed);
-    web3.eth.getBalance(theToken.address).should.be.bignumber.equal(preBalance.minus(withdrawAmount));
-    web3.eth.getBalance(expectedWithdraw).should.be.bignumber.equal(withdrawPreBalance.plus(withdrawAmount).minus(txCost));
+    web3.eth.getBalance(theToken.address).should.be.bignumber.equal(preBalance.sub(withdrawAmount));
+    web3.eth.getBalance(expectedWithdraw).should.be.bignumber.equal(withdrawPreBalance.plus(withdrawAmount).sub(txCost));
   });
 
   it("should allow setting allowance and allowed user to transferFrom() the tokens.", async function () {
