@@ -190,13 +190,13 @@ contract('Token funded', function (accounts) {
 
   it("should accept funds from whitelisted address user1.", async function () {
     let isUser1Whitelisted = await theToken.whitelist(user1);
-    const preBalance = web3.eth.getBalance(theToken.address);
+    const preBalance = await web3.eth.getBalance(theToken.address);
     expect(preBalance).to.be.bignumber.equal(0);
     isUser1Whitelisted.should.equal(true);
     const etherSentToContract = user1SendFunds;
     const sendTransaction = theToken.sendTransaction({ from: user1, value: etherSentToContract });
     const callResult = await sendTransaction.should.not.be.rejected;
-    const newBalance = web3.eth.getBalance(theToken.address);
+    const newBalance = await web3.eth.getBalance(theToken.address);
     expect(preBalance.add(etherSentToContract)).to.be.bignumber.equal(newBalance);
     const expectedBonusFactor = 1.0; // bonusPhase is off, so we can always expect 1.0 here.
     const expectedTokenAmount = (await theToken.ETH_CRWDTOKEN()).mul(etherSentToContract).mul(expectedBonusFactor);
@@ -304,7 +304,7 @@ contract('Token funded', function (accounts) {
     // make sure another investment works before the time jump, after which it is rejected.
     const investAmount = ether("0.001");
     await theToken.sendTransaction({ from: user1, value: investAmount }).should.not.be.rejected;
-    expect(web3.eth.getBalance(theToken.address)).to.be.bignumber.below((new BigNumber(weiICOMaximum)).sub(investAmount));
+    expect(await web3.eth.getBalance(theToken.address)).to.be.bignumber.below((new BigNumber(weiICOMaximum)).sub(investAmount));
     await advanceToBlock(endBlock + 1);
     await theToken.sendTransaction({ from: user1, value: investAmount }).should.be.rejectedWith(revert);
   });
@@ -357,16 +357,16 @@ contract('Token funded', function (accounts) {
 
   it("should allow ETH withdrawal after ICO.", async function () {
     const withdrawAmount = (new BigNumber(ether("0.1")));
-    const preBalance = web3.eth.getBalance(theToken.address);
+    const preBalance = await web3.eth.getBalance(theToken.address);
     expect(preBalance).to.be.bignumber.above(withdrawAmount);
-    const withdrawPreBalance = web3.eth.getBalance(expectedWithdraw);
+    const withdrawPreBalance = await web3.eth.getBalance(expectedWithdraw);
     // fails from others than the withdraw control account
     await theToken.requestPayout(withdrawAmount).should.be.rejectedWith(revert);
     const callResult = await theToken.requestPayout(withdrawAmount, { from: expectedWithdraw }).should.not.be.rejected;
     const tx = await web3.eth.getTransaction(callResult.tx);
     const txCost = tx.gasPrice.mul(callResult.receipt.gasUsed);
-    expect(web3.eth.getBalance(theToken.address)).to.be.bignumber.equal(preBalance.sub(withdrawAmount));
-    expect(web3.eth.getBalance(expectedWithdraw)).to.be.bignumber.equal(withdrawPreBalance.add(withdrawAmount).sub(txCost));
+    expect(await web3.eth.getBalance(theToken.address)).to.be.bignumber.equal(preBalance.sub(withdrawAmount));
+    expect(await web3.eth.getBalance(expectedWithdraw)).to.be.bignumber.equal(withdrawPreBalance.add(withdrawAmount).sub(txCost));
   });
 
   it("should allow setting allowance and allowed user to transferFrom() the tokens.", async function () {

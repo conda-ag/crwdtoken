@@ -189,13 +189,13 @@ contract('Token funded', function (accounts) {
 
   it("should accept funds from whitelisted address user1.", async function () {
     let isUser1Whitelisted = await theToken.whitelist(user1);
-    const preBalance = web3.eth.getBalance(theToken.address);
+    const preBalance = await web3.eth.getBalance(theToken.address);
     expect(preBalance).to.be.bignumber.equal(0);
     isUser1Whitelisted.should.equal(true);
     const etherSentToContract = user1SendFunds;
     const sendTransaction = theToken.sendTransaction({ from: user1, value: etherSentToContract });
     const callResult = await sendTransaction.should.not.be.rejected;
-    const newBalance = web3.eth.getBalance(theToken.address);
+    const newBalance = await web3.eth.getBalance(theToken.address);
     expect(preBalance.add(etherSentToContract)).to.be.bignumber.equal(newBalance);
     const expectedBonusFactor = 1.0; // bonusPhase is off, so we can always expect 1.0 here.
     const expectedTokenAmount = (await theToken.ETH_CRWDTOKEN()).mul(etherSentToContract).mul(expectedBonusFactor);
@@ -303,7 +303,7 @@ contract('Token funded', function (accounts) {
     // make sure another investment works before the time jump, after which it is rejected.
     const investAmount = ether("0.001");
     await theToken.sendTransaction({ from: user1, value: investAmount }).should.not.be.rejected;
-    expect(web3.eth.getBalance(theToken.address)).to.be.bignumber.below((new BigNumber(weiICOMaximum)).sub(investAmount));
+    expect(await web3.eth.getBalance(theToken.address)).to.be.bignumber.below((new BigNumber(weiICOMaximum)).sub(investAmount));
     await advanceToBlock(endBlock + 1);
     await theToken.sendTransaction({ from: user1, value: investAmount }).should.be.rejectedWith(revert);
   });
@@ -356,16 +356,16 @@ contract('Token funded', function (accounts) {
 
   it("should allow ETH withdrawal after ICO.", async function () {
     const withdrawAmount = (new BigNumber(ether("0.1")));
-    const preBalance = web3.eth.getBalance(theToken.address);
+    const preBalance = await web3.eth.getBalance(theToken.address);
     expect(preBalance).to.be.bignumber.above(withdrawAmount);
-    const withdrawPreBalance = web3.eth.getBalance(expectedWithdraw);
+    const withdrawPreBalance = await web3.eth.getBalance(expectedWithdraw);
     // fails from others than the withdraw control account
     await theToken.requestPayout(withdrawAmount).should.be.rejectedWith(revert);
     const callResult = await theToken.requestPayout(withdrawAmount, { from: expectedWithdraw }).should.not.be.rejected;
     const tx = await web3.eth.getTransaction(callResult.tx);
     const txCost = tx.gasPrice.mul(callResult.receipt.gasUsed);
-    expect(web3.eth.getBalance(theToken.address)).to.be.bignumber.equal(preBalance.sub(withdrawAmount));
-    expect(web3.eth.getBalance(expectedWithdraw)).to.be.bignumber.equal(withdrawPreBalance.add(withdrawAmount).sub(txCost));
+    expect(await web3.eth.getBalance(theToken.address)).to.be.bignumber.equal(preBalance.sub(withdrawAmount));
+    expect(await web3.eth.getBalance(expectedWithdraw)).to.be.bignumber.equal(withdrawPreBalance.add(withdrawAmount).sub(txCost));
   });
 
   it("should allow setting allowance and allowed user to transferFrom() the tokens.", async function () {
@@ -629,23 +629,23 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
 
   it("should accept lots of small funds from  whitelisted address user1.", async function () {
     let isUser1Whitelisted = await theToken.whitelist(user1);
-    const preBalance = web3.eth.getBalance(theToken.address);
+    const preBalance = await web3.eth.getBalance(theToken.address);
     expect(preBalance).to.be.bignumber.equal(0);
     let currentBalance = new BigNumber("0");
     const user1SendFunds = ether("0.001");
     isUser1Whitelisted.should.equal(true);
     for (let i = 0; i < 100; i++) {
       await theToken.sendTransaction({ from: user1, value: user1SendFunds }).should.not.be.rejected;
-      const postBalance = web3.eth.getBalance(theToken.address);
+      const postBalance = await web3.eth.getBalance(theToken.address);
       currentBalance = currentBalance.add(user1SendFunds);
       expect(currentBalance).to.be.bignumber.equal(postBalance);
     }
-    const postBalance = web3.eth.getBalance(theToken.address);
+    const postBalance = await web3.eth.getBalance(theToken.address);
     let remaining = new BigNumber(weiICOMaximum).sub(postBalance);
     let aBitTooMuch = remaining.add(ether("0.001"));
     await theToken.sendTransaction({ from: user1, value: aBitTooMuch }).should.be.rejected;
     await theToken.sendTransaction({ from: user1, value: remaining }).should.not.be.rejected;
-    const finalBalance = web3.eth.getBalance(theToken.address);
+    const finalBalance = await web3.eth.getBalance(theToken.address);
     currentBalance = currentBalance.add(remaining);
     expect(currentBalance).to.be.bignumber.equal(finalBalance);
 
@@ -820,9 +820,9 @@ contract('TokenContract underfunded and refund.', function (accounts) {
   });
 
   it("should not let users get their refund while in ico state.", async function () {
-    const pre = web3.eth.getBalance(user1);
+    const pre = await web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.be.rejected;
-    const post = web3.eth.getBalance(user1);
+    const post = await web3.eth.getBalance(user1);
     expect(post.sub(pre)).to.be.bignumber.equal(0);
   });
 
@@ -837,24 +837,24 @@ contract('TokenContract underfunded and refund.', function (accounts) {
   });
 
   it("should let users get their refund in underfunded state.", async function () {
-    const pre = web3.eth.getBalance(user1);
+    const pre = await web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.not.be.rejected;
-    const post = web3.eth.getBalance(user1);
+    const post = await web3.eth.getBalance(user1);
     expect(post.sub(pre)).to.be.bignumber.equal(user1SendFunds);
   });
 
   it("should not let users get their refund twice in underfunded state.", async function () {
-    const pre = web3.eth.getBalance(user1);
+    const pre = await web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.be.rejected;
-    const post = web3.eth.getBalance(user1);
+    const post = await web3.eth.getBalance(user1);
     expect(post.sub(pre)).to.be.bignumber.equal(0);
   });
 
 
   it("should not let users without funds get a refund in underfunded state.", async function () {
-    const pre = web3.eth.getBalance(user3);
+    const pre = await web3.eth.getBalance(user3);
     await theToken.requestRefund({ from: user3, gasPrice: 0 }).should.be.rejected;
-    const post = web3.eth.getBalance(user3);
+    const post = await web3.eth.getBalance(user3);
     expect(post.sub(pre)).to.be.bignumber.equal(0);
   });
 
@@ -973,9 +973,9 @@ contract('TokenContract paused and restarted and aborted', function (accounts) {
   });
 
   it("should let users withdraw funds in underfunded state.", async function () {
-    const pre = web3.eth.getBalance(user1);
+    const pre = await web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.not.be.rejected;
-    const post = web3.eth.getBalance(user1);
+    const post = await web3.eth.getBalance(user1);
     expect(post.sub(pre)).to.be.bignumber.equal(user1SendFunds);
   });
 
