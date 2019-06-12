@@ -1,9 +1,7 @@
 pragma solidity ^0.4.24;
 
-
 import './zeppelin_v1_12_0/ERC20Basic.sol';
 import './CrwdToken.sol';
-
 
 contract CrwdTimelock {
     using SafeMath for uint256;
