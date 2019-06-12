@@ -76,14 +76,14 @@ contract CrwdToken is StandardToken {
 
     //this creates the contract and stores the owner. it also passes in 3 addresses to be used later during the lifetime of the contract.
     constructor(
-        address _stateControl
-    , address _whitelistControl
-    , address _withdrawControl
-    , address _tokenAssignmentControl
-    , address _notLocked //15%
-    , address _lockedTeam //15%
-    , address _lockedDev //10%
-    , address _lockedCountry //10%
+        address _stateControl,
+        address _whitelistControl,
+        address _withdrawControl,
+        address _tokenAssignmentControl,
+        address _notLocked, //15%
+        address _lockedTeam, //15%
+        address _lockedDev, //10%
+        address _lockedCountry //10%
     ) public {
         stateControl = _stateControl;
         whitelistControl = _whitelistControl;
