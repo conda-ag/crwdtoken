@@ -19,6 +19,8 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
+const { expect } = require('chai');
+
 const TokenContract = artifacts.require("./CrwdToken.sol");
 const TimelockContract = artifacts.require("./CrwdTimelock.sol");
 
@@ -69,20 +71,20 @@ contract('Token funded and stopped by admin and operational.', function (account
   })
 
   it("should be in Initial state", async function () {
-    (await theToken.state()).should.be.bignumber.equal(States.Initial);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Initial);
   });
 
   it("should accept valid min and max values with correct key.", async function () {
     await theToken.updateEthICOThresholds(weiICOMinimum, weiICOMaximum, "0", endBlock, { from: expectedStateControl }).should.not.be.rejected;
-    (await theToken.weiICOMinimum()).should.be.bignumber.equal(weiICOMinimum);
-    (await theToken.weiICOMaximum()).should.be.bignumber.equal(weiICOMaximum);
-    (await theToken.endBlock()).should.be.bignumber.equal(endBlock);
-    (await theToken.state()).should.be.bignumber.equal(States.ValuationSet);
+    expect(await theToken.weiICOMinimum()).to.be.bignumber.equal(weiICOMinimum);
+    expect(await theToken.weiICOMaximum()).to.be.bignumber.equal(weiICOMaximum);
+    expect(await theToken.endBlock()).to.be.bignumber.equal(endBlock);
+    expect(await theToken.state()).to.be.bignumber.equal(States.ValuationSet);
   });
 
   it("should start ICO. ", async function () {
     await theToken.startICO({ from: expectedStateControl });
-    (await theToken.state()).should.be.bignumber.equal(States.Ico);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Ico);
   });
 
   it("should whitelist address user1 with correct key.", async function () {
@@ -98,9 +100,9 @@ contract('Token funded and stopped by admin and operational.', function (account
   });
 
   it("should accept stopping ICO by admin before ICO timeout.", async function () {
-    (await theToken.state()).should.be.bignumber.equal(States.Ico);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Ico);
     await theToken.endICO({ from: expectedStateControl }).should.not.be.rejected;
-    (await theToken.state()).should.be.bignumber.equal(States.Operational);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Operational);
   });
 
 });

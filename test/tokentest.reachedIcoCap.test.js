@@ -19,6 +19,8 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
+const { expect } = require('chai');
+
 const TokenContract = artifacts.require("./CrwdToken.sol");
 const TimelockContract = artifacts.require("./CrwdTimelock.sol");
 
@@ -67,20 +69,20 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
   })
 
   it("should be in Initial state", async function () {
-    (await theToken.state()).should.be.bignumber.equal(States.Initial);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Initial);
   });
 
   it("should accept valid min and max values with correct key.", async function () {
     await theToken.updateEthICOThresholds(weiICOMinimum, weiICOMaximum, "0", endBlock, { from: expectedStateControl }).should.not.be.rejected;
-    (await theToken.weiICOMinimum()).should.be.bignumber.equal(weiICOMinimum);
-    (await theToken.weiICOMaximum()).should.be.bignumber.equal(weiICOMaximum);
-    (await theToken.endBlock()).should.be.bignumber.equal(endBlock);
-    (await theToken.state()).should.be.bignumber.equal(States.ValuationSet);
+    expect(await theToken.weiICOMinimum()).to.be.bignumber.equal(weiICOMinimum);
+    expect(await theToken.weiICOMaximum()).to.be.bignumber.equal(weiICOMaximum);
+    expect(await theToken.endBlock()).to.be.bignumber.equal(endBlock);
+    expect(await theToken.state()).to.be.bignumber.equal(States.ValuationSet);
   });
 
   it("should start ICO. ", async function () {
     await theToken.startICO({ from: expectedStateControl });
-    (await theToken.state()).should.be.bignumber.equal(States.Ico);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Ico);
   });
 
   it("should whitelist address user1 with correct key.", async function () {
@@ -92,7 +94,7 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
   it("should accept lots of small funds from  whitelisted address user1.", async function () {
     let isUser1Whitelisted = await theToken.whitelist(user1);
     const preBalance = web3.eth.getBalance(theToken.address);
-    preBalance.should.be.bignumber.equal(0);
+    expect(preBalance).to.be.bignumber.equal(0);
     let currentBalance = new BigNumber("0");
     const user1SendFunds = ether("0.001");
     isUser1Whitelisted.should.equal(true);
@@ -100,7 +102,7 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
       await theToken.sendTransaction({ from: user1, value: user1SendFunds }).should.not.be.rejected;
       const postBalance = web3.eth.getBalance(theToken.address);
       currentBalance = currentBalance.add(user1SendFunds);
-      currentBalance.should.be.bignumber.equal(postBalance);
+      expect(currentBalance).to.be.bignumber.equal(postBalance);
     }
     const postBalance = web3.eth.getBalance(theToken.address);
     let remaining = new BigNumber(weiICOMaximum).sub(postBalance);
@@ -109,14 +111,14 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
     await theToken.sendTransaction({ from: user1, value: remaining }).should.not.be.rejected;
     const finalBalance = web3.eth.getBalance(theToken.address);
     currentBalance = currentBalance.add(remaining);
-    currentBalance.should.be.bignumber.equal(finalBalance);
+    expect(currentBalance).to.be.bignumber.equal(finalBalance);
 
   });
 
   it("should accept stopping ICO by admin before ICO timeout.", async function () {
-    (await theToken.state()).should.be.bignumber.equal(States.Ico);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Ico);
     await theToken.endICO({ from: expectedStateControl }).should.not.be.rejected;
-    (await theToken.state()).should.be.bignumber.equal(States.Operational);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Operational);
   });
 
 });

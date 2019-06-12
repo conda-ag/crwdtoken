@@ -20,6 +20,8 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
+const { expect } = require('chai');
+
 const TokenContract = artifacts.require("./CrwdToken.sol");
 const TimelockContract = artifacts.require("./CrwdTimelock.sol");
 
@@ -84,29 +86,29 @@ contract('Token funded', function (accounts) {
   });
 
   it("should be in Initial state", async function () {
-    (await theToken.state()).should.be.bignumber.equal(States.Initial);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Initial);
   });
 
   it("should have initial account balances", async function () {
-    (await theToken.balanceOf(expectedNotLocked)).should.be.bignumber.equal(0);
+    expect(await theToken.balanceOf(expectedNotLocked)).to.be.bignumber.equal(0);
   });
 
   it("should reject adding a presale amount during Initial.", async function () {
     const presaleAmount = 1000;
     // fails from others than the token assignment control account
     await theToken.addPresaleAmount(user2, presaleAmount, { from: expectedTokenAssignmentControl }).should.be.rejectedWith(revert);
-    (await theToken.balanceOf(user2)).should.be.bignumber.equal(0);
+    expect(await theToken.balanceOf(user2)).to.be.bignumber.equal(0);
   });
 
   it("should reject setting eth min and max thresholds without stateControlKey.", async function () {
-    (await theToken.state()).should.be.bignumber.equal(States.Initial);
-    (await theToken.weiICOMinimum()).should.be.bignumber.equal(0);
-    (await theToken.weiICOMaximum()).should.be.bignumber.equal(0);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Initial);
+    expect(await theToken.weiICOMinimum()).to.be.bignumber.equal(0);
+    expect(await theToken.weiICOMaximum()).to.be.bignumber.equal(0);
     await theToken.updateEthICOThresholds(weiICOMinimum, weiICOMaximum, "0", endBlock, { from: user1 }).should.be.rejected;
-    (await theToken.weiICOMinimum()).should.be.bignumber.equal(0);
-    (await theToken.weiICOMaximum()).should.be.bignumber.equal(0);
-    (await theToken.endBlock()).should.be.bignumber.equal(0);
-    (await theToken.state()).should.be.bignumber.equal(States.Initial);
+    expect(await theToken.weiICOMinimum()).to.be.bignumber.equal(0);
+    expect(await theToken.weiICOMaximum()).to.be.bignumber.equal(0);
+    expect(await theToken.endBlock()).to.be.bignumber.equal(0);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Initial);
   });
 
   it("should not let ICO start without correct key or without setting min and max.", async function () {
@@ -117,30 +119,30 @@ contract('Token funded', function (accounts) {
 
   it("should reject max smaller than min values.", async function () {
     await theToken.updateEthICOThresholds(weiICOMaximum, weiICOMinimum, "0", endBlock, { from: expectedStateControl }).should.be.rejectedWith(revert);
-    (await theToken.weiICOMinimum()).should.be.bignumber.equal(0);
-    (await theToken.weiICOMaximum()).should.be.bignumber.equal(0);
-    (await theToken.state()).should.be.bignumber.equal(States.Initial);
+    expect(await theToken.weiICOMinimum()).to.be.bignumber.equal(0);
+    expect(await theToken.weiICOMaximum()).to.be.bignumber.equal(0);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Initial);
   });
 
   it("should reject max smaller than min values with negative values.", async function () {
     await theToken.updateEthICOThresholds("-1", "-5", "0", endBlock, { from: expectedStateControl }).should.be.rejectedWith(revert);
-    (await theToken.weiICOMinimum()).should.be.bignumber.equal(0);
-    (await theToken.weiICOMaximum()).should.be.bignumber.equal(0);
-    (await theToken.state()).should.be.bignumber.equal(States.Initial);
+    expect(await theToken.weiICOMinimum()).to.be.bignumber.equal(0);
+    expect(await theToken.weiICOMaximum()).to.be.bignumber.equal(0);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Initial);
   });
 
   it("should accept correct min and max values with correct key.", async function () {
     const callResult = await theToken.updateEthICOThresholds(weiICOMinimum, weiICOMaximum, silencePeriod, endBlock, { from: expectedStateControl }).should.not.be.rejected;
     const expStateEvent = callResult.logs[0];
     expStateEvent.event.should.be.equal('StateTransition');
-    expStateEvent.args.oldState.should.be.bignumber.equal(States.Initial);
-    expStateEvent.args.newState.should.be.bignumber.equal(States.ValuationSet);
-    (await theToken.weiICOMinimum()).should.be.bignumber.equal(weiICOMinimum);
-    (await theToken.weiICOMaximum()).should.be.bignumber.equal(weiICOMaximum);
-    (await theToken.endBlock()).should.be.bignumber.equal(endBlock);
-    (await theToken.silencePeriod()).should.be.bignumber.equal(silencePeriod);
-    (await theToken.ETH_CRWDTOKEN()).should.be.bignumber.equal((await theToken.maxTotalSupply()).mul(await theToken.percentForSale()).div(100).div(weiICOMaximum));
-    (await theToken.state()).should.be.bignumber.equal(States.ValuationSet);
+    expect(expStateEvent.args.oldState).to.be.bignumber.equal(States.Initial);
+    expect(expStateEvent.args.newState).to.be.bignumber.equal(States.ValuationSet);
+    expect(await theToken.weiICOMinimum()).to.be.bignumber.equal(weiICOMinimum);
+    expect(await theToken.weiICOMaximum()).to.be.bignumber.equal(weiICOMaximum);
+    expect(await theToken.endBlock()).to.be.bignumber.equal(endBlock);
+    expect(await theToken.silencePeriod()).to.be.bignumber.equal(silencePeriod);
+    expect(await theToken.ETH_CRWDTOKEN()).to.be.bignumber.equal((await theToken.maxTotalSupply()).mul(await theToken.percentForSale()).div(100).div(weiICOMaximum));
+    expect(await theToken.state()).to.be.bignumber.equal(States.ValuationSet);
   });
 
   it("should allow adding a presale amount during Valuation.", async function () {
@@ -149,12 +151,12 @@ contract('Token funded', function (accounts) {
     // fails from others than the token assignment control account
     await theToken.addPresaleAmount(user2, presaleAmount).should.be.rejectedWith(revert);
     await theToken.addPresaleAmount(user2, presaleAmount, { from: expectedTokenAssignmentControl }).should.not.be.rejected;
-    (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.add(presaleAmount));
+    expect(await theToken.balanceOf(user2)).to.be.bignumber.equal(balanceBefore.add(presaleAmount));
   });
 
   it("should start ICO.", async function () {
     await theToken.startICO({ from: expectedStateControl });
-    (await theToken.state()).should.be.bignumber.equal(States.Ico);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Ico);
   });
 
   it("should not whitelist by default address user1.", async function () {
@@ -189,30 +191,30 @@ contract('Token funded', function (accounts) {
   it("should accept funds from whitelisted address user1.", async function () {
     let isUser1Whitelisted = await theToken.whitelist(user1);
     const preBalance = web3.eth.getBalance(theToken.address);
-    preBalance.should.be.bignumber.equal(0);
+    expect(preBalance).to.be.bignumber.equal(0);
     isUser1Whitelisted.should.equal(true);
     const etherSentToContract = user1SendFunds;
     const sendTransaction = theToken.sendTransaction({ from: user1, value: etherSentToContract });
     const callResult = await sendTransaction.should.not.be.rejected;
     const newBalance = web3.eth.getBalance(theToken.address);
-    preBalance.add(etherSentToContract).should.be.bignumber.equal(newBalance);
+    expect(preBalance.add(etherSentToContract)).to.be.bignumber.equal(newBalance);
     const expectedBonusFactor = 1.0; // bonusPhase is off, so we can always expect 1.0 here.
     const expectedTokenAmount = (await theToken.ETH_CRWDTOKEN()).mul(etherSentToContract).mul(expectedBonusFactor);
     const expMintEvent = callResult.logs[0];
     // Mint(to: 0xb106a247aa0452d4b73c37e4d215568e604793c0, amount: 225000000000000000000)
     expMintEvent.event.should.be.equal('Mint');
     expMintEvent.args.to.should.be.equal(user1);
-    expMintEvent.args.amount.should.be.bignumber.equal(expectedTokenAmount);
+    expect(expMintEvent.args.amount).to.be.bignumber.equal(expectedTokenAmount);
     const expTxEvent = callResult.logs[1];
     // Transfer(from: 0x0, to: 0xb106a247aa0452d4b73c37e4d215568e604793c0, value: 225000000000000000000)
     expTxEvent.event.should.be.equal('Transfer');
     expTxEvent.args.from.should.be.equal('0x0000000000000000000000000000000000000000'); // on this specific token contract!
     expTxEvent.args.to.should.be.equal(user1);
-    expTxEvent.args.value.should.be.bignumber.equal(expectedTokenAmount);
-    (await theToken.balanceOf(user1)).should.be.bignumber.equal(expectedTokenAmount);
-    (await theToken.ethPossibleRefunds(user1)).should.be.bignumber.equal(etherSentToContract);
+    expect(expTxEvent.args.value).to.be.bignumber.equal(expectedTokenAmount);
+    expect(await theToken.balanceOf(user1)).to.be.bignumber.equal(expectedTokenAmount);
+    expect(await theToken.ethPossibleRefunds(user1)).to.be.bignumber.equal(etherSentToContract);
     // In this kind of token, the reserves stay 0 until ICO is finished. In others, this isn't the case.
-    (await theToken.balanceOf(expectedNotLocked)).should.be.bignumber.equal(0);
+    expect(await theToken.balanceOf(expectedNotLocked)).to.be.bignumber.equal(0);
   });
 
   it("should fail to accept funds above the limit from whitelisted address user1.", async function () {
@@ -224,7 +226,7 @@ contract('Token funded', function (accounts) {
 
   it("should have the correct bonus applied when bonus phase is on.", async function () {
     const oneKTokens = (new BigNumber(ether("1"))).mul(1000);
-    (await theToken.addBonus(oneKTokens.mul(1))).dividedBy(oneKTokens).should.be.bignumber.equal(1);
+    expect((await theToken.addBonus(oneKTokens.mul(1))).dividedBy(oneKTokens)).to.be.bignumber.equal(1);
     await theToken.setBonusPhase(true, { from: expectedStateControl });
     (await theToken.bonusPhase()).should.be.equal(true);
     let expectedBonuses = [
@@ -253,7 +255,7 @@ contract('Token funded', function (accounts) {
       { ktokens: 900, factor: 1.300 },
     ];
     for (let bonus of expectedBonuses) {
-      (await theToken.addBonus(oneKTokens.mul(bonus.ktokens))).dividedBy(oneKTokens.mul(bonus.ktokens)).should.be.bignumber.equal(bonus.factor);
+      expect((await theToken.addBonus(oneKTokens.mul(bonus.ktokens))).dividedBy(oneKTokens.mul(bonus.ktokens))).to.be.bignumber.equal(bonus.factor);
     }
     await theToken.setBonusPhase(false, { from: expectedStateControl });
     (await theToken.bonusPhase()).should.be.equal(false);
@@ -268,41 +270,41 @@ contract('Token funded', function (accounts) {
     const expMintEvent = callResult.logs[0];
     expMintEvent.event.should.be.equal('Mint');
     expMintEvent.args.to.should.be.equal(user2);
-    expMintEvent.args.amount.should.be.bignumber.equal(presaleAmount);
+    expect(expMintEvent.args.amount).to.be.bignumber.equal(presaleAmount);
     const expTxEvent = callResult.logs[1];
     expTxEvent.event.should.be.equal('Transfer');
     expTxEvent.args.from.should.be.equal('0x0000000000000000000000000000000000000000'); // on this specific token contract!
     expTxEvent.args.to.should.be.equal(user2);
-    expTxEvent.args.value.should.be.bignumber.equal(presaleAmount);
-    (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.add(presaleAmount));
-    (await theToken.soldTokens()).should.be.bignumber.equal(soldBefore.add(presaleAmount));
-    (await theToken.totalSupply()).should.be.bignumber.equal(totalBefore.add(presaleAmount.mul(100).div(await theToken.percentForSale())));
+    expect(expTxEvent.args.value).to.be.bignumber.equal(presaleAmount);
+    expect(await theToken.balanceOf(user2)).to.be.bignumber.equal(balanceBefore.add(presaleAmount));
+    expect(await theToken.soldTokens()).to.be.bignumber.equal(soldBefore.add(presaleAmount));
+    expect(await theToken.totalSupply()).to.be.bignumber.equal(totalBefore.add(presaleAmount.mul(100).div(await theToken.percentForSale())));
     // addPresaleAmount should not allow integer overflow! We try with a value that would overflow to 1
     const targetedHugeAmount = (new BigNumber("2")).pow(256).sub(balanceBefore.add(presaleAmount)).add(1);
     await reverting(theToken.addPresaleAmount(user2, targetedHugeAmount, { from: expectedTokenAssignmentControl }));
-    (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.add(presaleAmount));
+    expect(await theToken.balanceOf(user2)).to.be.bignumber.equal(balanceBefore.add(presaleAmount));
   });
 
   it("should reject assignment and release inside of a timelock contract.", async function () {
     let timelockAddress = await theToken.teamTimeLock();
     let timelock = TimelockContract.at(timelockAddress);
-    (await theToken.balanceOf(timelockAddress)).should.be.bignumber.equal(0);
+    expect(await theToken.balanceOf(timelockAddress)).to.be.bignumber.equal(0);
     const tokenAssginmentAmount = 1000; // depends on bonus scheme!
     await timelock.assignToBeneficiary(user1, tokenAssginmentAmount, { from: ownerLockedTeam }).should.be.rejectedWith(revert);
     await timelock.release(user1).should.be.rejectedWith(revert);
   });
 
   it("should fail to stop ICO by anyone before ICO timeout.", async function () {
-    (await theToken.state()).should.be.bignumber.equal(States.Ico);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Ico);
     await theToken.anyoneEndICO().should.be.rejected;
-    (await theToken.state()).should.be.bignumber.equal(States.Ico);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Ico);
   });
 
   it("should reject funds from whitelisted address user1 after ICO timeout.", async function () {
     // make sure another investment works before the time jump, after which it is rejected.
     const investAmount = ether("0.001");
     await theToken.sendTransaction({ from: user1, value: investAmount }).should.not.be.rejected;
-    web3.eth.getBalance(theToken.address).should.be.bignumber.below((new BigNumber(weiICOMaximum)).sub(investAmount));
+    expect(web3.eth.getBalance(theToken.address)).to.be.bignumber.below((new BigNumber(weiICOMaximum)).sub(investAmount));
     await advanceToBlock(endBlock + 1);
     await theToken.sendTransaction({ from: user1, value: investAmount }).should.be.rejectedWith(revert);
   });
@@ -313,10 +315,10 @@ contract('Token funded', function (accounts) {
   });
 
   it("should accept stopping ICO by anyone after ICO timeout.", async function () {
-    (await theToken.state()).should.be.bignumber.equal(States.Ico);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Ico);
     const callResult = await theToken.anyoneEndICO().should.not.be.rejected;
     let totalSupply = await theToken.totalSupply();
-    (await theToken.soldTokens()).mul(100).dividedBy(totalSupply).should.be.bignumber.equal(await theToken.percentForSale());
+    expect((await theToken.soldTokens()).mul(100).dividedBy(totalSupply)).to.be.bignumber.equal(await theToken.percentForSale());
     // We issue to multiple reserves buckets, we get Mint and Trasfer events for each.
     const reservesBuckets = [
       { address: await theToken.teamTimeLock(), percent: 15 },
@@ -328,21 +330,21 @@ contract('Token funded', function (accounts) {
       const expMintEvent = callResult.logs[i * 2];
       expMintEvent.event.should.be.equal('Mint');
       expMintEvent.args.to.should.be.equal(reservesBuckets[i].address);
-      expMintEvent.args.amount.mul(100).dividedBy(totalSupply).should.be.bignumber.equal(reservesBuckets[i].percent);
+      expect(expMintEvent.args.amount.mul(100).dividedBy(totalSupply)).to.be.bignumber.equal(reservesBuckets[i].percent);
       const expTxEvent = callResult.logs[i * 2 + 1];
       expTxEvent.event.should.be.equal('Transfer');
       expTxEvent.args.from.should.be.equal('0x0000000000000000000000000000000000000000');
       expTxEvent.args.to.should.be.equal(reservesBuckets[i].address);
-      expTxEvent.args.value.mul(100).dividedBy(totalSupply).should.be.bignumber.equal(reservesBuckets[i].percent);
-      (await theToken.balanceOf(reservesBuckets[i].address)).mul(100).dividedBy(totalSupply).should.be.bignumber.equal(reservesBuckets[i].percent);
+      expect(expTxEvent.args.value.mul(100).dividedBy(totalSupply)).to.be.bignumber.equal(reservesBuckets[i].percent);
+      expect((await theToken.balanceOf(reservesBuckets[i].address)).mul(100).dividedBy(totalSupply)).to.be.bignumber.equal(reservesBuckets[i].percent);
     }
     const expFinishedEvent = callResult.logs[reservesBuckets.length * 2];
     expFinishedEvent.event.should.be.equal('MintFinished');
     const expStateEvent = callResult.logs[reservesBuckets.length * 2 + 1];
     expStateEvent.event.should.be.equal('StateTransition');
-    expStateEvent.args.oldState.should.be.bignumber.equal(States.Ico);
-    expStateEvent.args.newState.should.be.bignumber.equal(States.Operational);
-    (await theToken.state()).should.be.bignumber.equal(States.Operational);
+    expect(expStateEvent.args.oldState).to.be.bignumber.equal(States.Ico);
+    expect(expStateEvent.args.newState).to.be.bignumber.equal(States.Operational);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Operational);
   });
 
   it("should reject adding a presale amount after ICO.", async function () {
@@ -350,21 +352,21 @@ contract('Token funded', function (accounts) {
     const presaleAmount = 1000;
     // fails from others than the token assignment control account
     await theToken.addPresaleAmount(user2, presaleAmount, { from: expectedTokenAssignmentControl }).should.be.rejectedWith(revert);
-    (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore);
+    expect(await theToken.balanceOf(user2)).to.be.bignumber.equal(balanceBefore);
   });
 
   it("should allow ETH withdrawal after ICO.", async function () {
     const withdrawAmount = (new BigNumber(ether("0.1")));
     const preBalance = web3.eth.getBalance(theToken.address);
-    preBalance.should.be.bignumber.above(withdrawAmount);
+    expect(preBalance).to.be.bignumber.above(withdrawAmount);
     const withdrawPreBalance = web3.eth.getBalance(expectedWithdraw);
     // fails from others than the withdraw control account
     await theToken.requestPayout(withdrawAmount).should.be.rejectedWith(revert);
     const callResult = await theToken.requestPayout(withdrawAmount, { from: expectedWithdraw }).should.not.be.rejected;
     const tx = await web3.eth.getTransaction(callResult.tx);
     const txCost = tx.gasPrice.mul(callResult.receipt.gasUsed);
-    web3.eth.getBalance(theToken.address).should.be.bignumber.equal(preBalance.sub(withdrawAmount));
-    web3.eth.getBalance(expectedWithdraw).should.be.bignumber.equal(withdrawPreBalance.add(withdrawAmount).sub(txCost));
+    expect(web3.eth.getBalance(theToken.address)).to.be.bignumber.equal(preBalance.sub(withdrawAmount));
+    expect(web3.eth.getBalance(expectedWithdraw)).to.be.bignumber.equal(withdrawPreBalance.add(withdrawAmount).sub(txCost));
   });
 
   it("should allow setting allowance and allowed user to transferFrom() the tokens.", async function () {
@@ -374,15 +376,15 @@ contract('Token funded', function (accounts) {
     expAllowEvent.event.should.be.equal('Approval');
     expAllowEvent.args.owner.should.be.equal(user1);
     expAllowEvent.args.spender.should.be.equal(user2);
-    expAllowEvent.args.value.should.be.bignumber.equal(approveAmount);
-    (await theToken.allowance(user1, user2)).should.be.bignumber.equal(approveAmount);
+    expect(expAllowEvent.args.value).to.be.bignumber.equal(approveAmount);
+    expect(await theToken.allowance(user1, user2)).to.be.bignumber.equal(approveAmount);
   });
 
   it("should allow to transferFrom() the allowed tokens.", async function () {
     const approveAmount = (await theToken.allowance(user1, user2));
     const preBalanceUser1 = (await theToken.balanceOf(user1));
     const preBalanceUser2 = (await theToken.balanceOf(user2));
-    preBalanceUser1.should.be.bignumber.above(approveAmount);
+    expect(preBalanceUser1).to.be.bignumber.above(approveAmount);
     // Sending to wrong users, too high amounts, or from others than the recipient fails.
     await reverting(theToken.transferFrom(user1, user3, approveAmount, { from: user3 }));
     await reverting(theToken.transferFrom(user1, user2, approveAmount.add(1), { from: user2 }));
@@ -392,26 +394,26 @@ contract('Token funded', function (accounts) {
     expTxEvent.event.should.be.equal('Transfer');
     expTxEvent.args.from.should.be.equal(user1);
     expTxEvent.args.to.should.be.equal(user2);
-    expTxEvent.args.value.should.be.bignumber.equal(approveAmount);
-    (await theToken.balanceOf(user1)).should.be.bignumber.equal(preBalanceUser1.sub(approveAmount));
-    (await theToken.balanceOf(user2)).should.be.bignumber.equal(preBalanceUser2.add(approveAmount));
+    expect(expTxEvent.args.value).to.be.bignumber.equal(approveAmount);
+    expect(await theToken.balanceOf(user1)).to.be.bignumber.equal(preBalanceUser1.sub(approveAmount));
+    expect(await theToken.balanceOf(user2)).to.be.bignumber.equal(preBalanceUser2.add(approveAmount));
     await reverting(theToken.transferFrom(user1, user2, "1", { from: user2 }));
   });
 
   it("should allow to transfer tokens to the token address.", async function () {
     const preBalanceUser = (await theToken.balanceOf(user2));
     const preBalanceToken = (await theToken.balanceOf(theToken.address));
-    preBalanceUser.should.be.bignumber.above(0);
-    preBalanceToken.should.be.bignumber.equal(0);
+    expect(preBalanceUser).to.be.bignumber.above(0);
+    expect(preBalanceToken).to.be.bignumber.equal(0);
     // Sending to wrong users, too high amounts, or from others than the recipient fails.
     const callResult = await theToken.transfer(theToken.address, preBalanceUser, { from: user2 }).should.not.be.rejected;
     const expTxEvent = callResult.logs[0];
     expTxEvent.event.should.be.equal('Transfer');
     expTxEvent.args.from.should.be.equal(user2);
     expTxEvent.args.to.should.be.equal(theToken.address);
-    expTxEvent.args.value.should.be.bignumber.equal(preBalanceUser);
-    (await theToken.balanceOf(user2)).should.be.bignumber.equal(0);
-    (await theToken.balanceOf(theToken.address)).should.be.bignumber.equal(preBalanceToken.add(preBalanceUser));
+    expect(expTxEvent.args.value).to.be.bignumber.equal(preBalanceUser);
+    expect(await theToken.balanceOf(user2)).to.be.bignumber.equal(0);
+    expect(await theToken.balanceOf(theToken.address)).to.be.bignumber.equal(preBalanceToken.add(preBalanceUser));
     await reverting(theToken.transfer(theToken.address, "1", { from: user2 }));
   });
 
@@ -424,9 +426,9 @@ contract('Token funded', function (accounts) {
     expTxEvent.event.should.be.equal('Transfer');
     expTxEvent.args.from.should.be.equal(theToken.address);
     expTxEvent.args.to.should.be.equal(user1);
-    expTxEvent.args.value.should.be.bignumber.equal(preBalanceToken);
-    (await theToken.balanceOf(theToken.address)).should.be.bignumber.equal(0);
-    (await theToken.balanceOf(user1)).should.be.bignumber.equal(preBalanceToken.add(preBalanceUser));
+    expect(expTxEvent.args.value).to.be.bignumber.equal(preBalanceToken);
+    expect(await theToken.balanceOf(theToken.address)).to.be.bignumber.equal(0);
+    expect(await theToken.balanceOf(user1)).to.be.bignumber.equal(preBalanceToken.add(preBalanceUser));
   });
 
   it("should allow assignment inside of a timelock contract.", async function () {
@@ -436,24 +438,24 @@ contract('Token funded', function (accounts) {
     const tokenAssginmentUser1 = 10000;
     const tokenAssginmentUser1_post = 9000;
     const tokenAssginmentUser2 = 5000;
-    timelockAmount.should.be.bignumber.above(tokenAssginmentUser1 + tokenAssginmentUser2);
+    expect(timelockAmount).to.be.bignumber.above(tokenAssginmentUser1 + tokenAssginmentUser2);
     // assigning more than the contract has should fail.
     await timelock.assignToBeneficiary(user1, timelockAmount.add(1), { from: ownerLockedTeam }).should.be.rejected;
-    (await timelock.balances(user1)).should.be.bignumber.equal(0);
-    (await timelock.assignedBalance()).should.be.bignumber.equal(0);
+    expect(await timelock.balances(user1)).to.be.bignumber.equal(0);
+    expect(await timelock.assignedBalance()).to.be.bignumber.equal(0);
     // Should be rejected when "anyone" calls it, succeed when contract owner is the caller.
     await timelock.assignToBeneficiary(user1, tokenAssginmentUser1).should.be.rejected;
     await timelock.assignToBeneficiary(user1, tokenAssginmentUser1, { from: ownerLockedTeam }).should.not.be.rejected;
-    (await timelock.balances(user1)).should.be.bignumber.equal(tokenAssginmentUser1);
-    (await timelock.assignedBalance()).should.be.bignumber.equal(tokenAssginmentUser1);
+    expect(await timelock.balances(user1)).to.be.bignumber.equal(tokenAssginmentUser1);
+    expect(await timelock.assignedBalance()).to.be.bignumber.equal(tokenAssginmentUser1);
     // Try a second assignment to see if assigned balance adjusts correctly.
     await timelock.assignToBeneficiary(user2, tokenAssginmentUser2, { from: ownerLockedTeam }).should.not.be.rejected;
-    (await timelock.balances(user2)).should.be.bignumber.equal(tokenAssginmentUser2);
-    (await timelock.assignedBalance()).should.be.bignumber.equal(tokenAssginmentUser1 + tokenAssginmentUser2);
+    expect(await timelock.balances(user2)).to.be.bignumber.equal(tokenAssginmentUser2);
+    expect(await timelock.assignedBalance()).to.be.bignumber.equal(tokenAssginmentUser1 + tokenAssginmentUser2);
     // Set user1 to lower assignment to check if that works fine as well.
     await timelock.assignToBeneficiary(user1, tokenAssginmentUser1_post, { from: ownerLockedTeam }).should.not.be.rejected;
-    (await timelock.balances(user1)).should.be.bignumber.equal(tokenAssginmentUser1_post);
-    (await timelock.assignedBalance()).should.be.bignumber.equal(tokenAssginmentUser1_post + tokenAssginmentUser2);
+    expect(await timelock.balances(user1)).to.be.bignumber.equal(tokenAssginmentUser1_post);
+    expect(await timelock.assignedBalance()).to.be.bignumber.equal(tokenAssginmentUser1_post + tokenAssginmentUser2);
     // Now try assigning just more than we have available.
     let aBitTooMuch = timelockAmount.sub(await timelock.assignedBalance()).add(1);
     await timelock.assignToBeneficiary(user3, aBitTooMuch, { from: ownerLockedTeam }).should.be.rejectedWith(revert);
@@ -464,10 +466,10 @@ contract('Token funded', function (accounts) {
     // Now release user1 tokens and check that everything work correctly with that.
     let user1balance_pre = await theToken.balanceOf(user1);
     await timelock.release(user1).should.not.be.rejected;
-    (await timelock.balances(user1)).should.be.bignumber.equal(0);
-    (await timelock.assignedBalance()).should.be.bignumber.equal(tokenAssginmentUser2);
-    (await theToken.balanceOf(user1)).should.be.bignumber.equal(user1balance_pre.add(tokenAssginmentUser1_post));
-    (await theToken.balanceOf(timelockAddress)).should.be.bignumber.equal(timelockAmount.sub(tokenAssginmentUser1_post));
+    expect(await timelock.balances(user1)).to.be.bignumber.equal(0);
+    expect(await timelock.assignedBalance()).to.be.bignumber.equal(tokenAssginmentUser2);
+    expect(await theToken.balanceOf(user1)).to.be.bignumber.equal(user1balance_pre.add(tokenAssginmentUser1_post));
+    expect(await theToken.balanceOf(timelockAddress)).to.be.bignumber.equal(timelockAmount.sub(tokenAssginmentUser1_post));
   });
 
   // modifiers should reject out of range values

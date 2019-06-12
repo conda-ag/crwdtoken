@@ -19,6 +19,8 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
+const { expect } = require('chai');
+
 const TokenContract = artifacts.require("./CrwdToken.sol");
 const TimelockContract = artifacts.require("./CrwdTimelock.sol");
 
@@ -69,20 +71,20 @@ contract('TokenContract underfunded and refund.', function (accounts) {
   })
 
   it("should be in Initial state", async function () {
-    (await theToken.state()).should.be.bignumber.equal(States.Initial);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Initial);
   });
 
   it("should accept valid min and max values with correct key.", async function () {
     await theToken.updateEthICOThresholds(weiICOMinimum, weiICOMaximum, "0", endBlock, { from: expectedStateControl }).should.not.be.rejected;
-    (await theToken.weiICOMinimum()).should.be.bignumber.equal(weiICOMinimum);
-    (await theToken.weiICOMaximum()).should.be.bignumber.equal(weiICOMaximum);
-    (await theToken.endBlock()).should.be.bignumber.equal(endBlock);
-    (await theToken.state()).should.be.bignumber.equal(States.ValuationSet);
+    expect(await theToken.weiICOMinimum()).to.be.bignumber.equal(weiICOMinimum);
+    expect(await theToken.weiICOMaximum()).to.be.bignumber.equal(weiICOMaximum);
+    expect(await theToken.endBlock()).to.be.bignumber.equal(endBlock);
+    expect(await theToken.state()).to.be.bignumber.equal(States.ValuationSet);
   });
 
   it("should start ICO. ", async function () {
     await theToken.startICO({ from: expectedStateControl });
-    (await theToken.state()).should.be.bignumber.equal(States.Ico);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Ico);
   });
 
   it("should whitelist address user1 with correct key.", async function () {
@@ -101,13 +103,13 @@ contract('TokenContract underfunded and refund.', function (accounts) {
     const pre = web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.be.rejected;
     const post = web3.eth.getBalance(user1);
-    post.sub(pre).should.be.bignumber.equal(0);
+    expect(post.sub(pre)).to.be.bignumber.equal(0);
   });
 
   it("should move to underfunded state at end of ICO.", async function () {
     await advanceToBlock(endBlock + 1);
     await theToken.anyoneEndICO().should.not.be.rejected;
-    (await theToken.state()).should.be.bignumber.equal(States.Underfunded);
+    expect(await theToken.state()).to.be.bignumber.equal(States.Underfunded);
   });
 
   it("should reject new funding in underfunded state.", async function () {
@@ -118,14 +120,14 @@ contract('TokenContract underfunded and refund.', function (accounts) {
     const pre = web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.not.be.rejected;
     const post = web3.eth.getBalance(user1);
-    post.sub(pre).should.be.bignumber.equal(user1SendFunds);
+    expect(post.sub(pre)).to.be.bignumber.equal(user1SendFunds);
   });
 
   it("should not let users get their refund twice in underfunded state.", async function () {
     const pre = web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.be.rejected;
     const post = web3.eth.getBalance(user1);
-    post.sub(pre).should.be.bignumber.equal(0);
+    expect(post.sub(pre)).to.be.bignumber.equal(0);
   });
 
 
@@ -133,7 +135,7 @@ contract('TokenContract underfunded and refund.', function (accounts) {
     const pre = web3.eth.getBalance(user3);
     await theToken.requestRefund({ from: user3, gasPrice: 0 }).should.be.rejected;
     const post = web3.eth.getBalance(user3);
-    post.sub(pre).should.be.bignumber.equal(0);
+    expect(post.sub(pre)).to.be.bignumber.equal(0);
   });
 
 
