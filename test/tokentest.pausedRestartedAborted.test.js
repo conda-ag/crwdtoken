@@ -15,7 +15,7 @@ import {
   latestTime
 } from 'truffle-test-helpers';
 
-const BigNumber = web3.BigNumber;
+import { BigNumber } from './helpers/customBN.js'
 
 require('chai')
   .use(require('chai-as-promised'))
