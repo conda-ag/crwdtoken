@@ -1,4 +1,3 @@
-import EVMThrow from './helpers/EVMThrow'
 import { deployTokenJustLikeInMigrations } from './helpers/deployTokenHelper.js'
 
 import {

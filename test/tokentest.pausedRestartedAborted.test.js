@@ -1,4 +1,4 @@
-import EVMThrow from './helpers/EVMThrow'
+import { reverting } from "./helpers/compare.js";
 import { deployTokenJustLikeInMigrations } from './helpers/deployTokenHelper.js'
 
 import {
@@ -276,7 +276,7 @@ contract('Token funded', function (accounts) {
     (await theToken.totalSupply()).should.be.bignumber.equal(totalBefore.plus(presaleAmount.times(100).div(await theToken.percentForSale())));
     // addPresaleAmount should not allow integer overflow! We try with a value that would overflow to 1
     const targetedHugeAmount = (new BigNumber(2)).pow(256).minus(balanceBefore.plus(presaleAmount)).plus(1);
-    await theToken.addPresaleAmount(user2, targetedHugeAmount, { from: expectedTokenAssignmentControl }).should.be.rejectedWith(EVMThrow);
+    await reverting(theToken.addPresaleAmount(user2, targetedHugeAmount, { from: expectedTokenAssignmentControl }));
     (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.plus(presaleAmount));
   });
 
@@ -381,9 +381,9 @@ contract('Token funded', function (accounts) {
     const preBalanceUser2 = (await theToken.balanceOf(user2));
     preBalanceUser1.should.be.bignumber.above(approveAmount);
     // Sending to wrong users, too high amounts, or from others than the recipient fails.
-    await theToken.transferFrom(user1, user3, approveAmount, { from: user3 }).should.be.rejectedWith(EVMThrow);
-    await theToken.transferFrom(user1, user2, approveAmount.plus(1), { from: user2 }).should.be.rejectedWith(EVMThrow);
-    await theToken.transferFrom(user1, user2, approveAmount).should.be.rejectedWith(EVMThrow);
+    await reverting(theToken.transferFrom(user1, user3, approveAmount, { from: user3 }));
+    await reverting(theToken.transferFrom(user1, user2, approveAmount.plus(1), { from: user2 }));
+    await reverting(theToken.transferFrom(user1, user2, approveAmount));
     const callResult = await theToken.transferFrom(user1, user2, approveAmount, { from: user2 }).should.not.be.rejected;
     const expTxEvent = callResult.logs[0];
     expTxEvent.event.should.be.equal('Transfer');
@@ -392,7 +392,7 @@ contract('Token funded', function (accounts) {
     expTxEvent.args.value.should.be.bignumber.equal(approveAmount);
     (await theToken.balanceOf(user1)).should.be.bignumber.equal(preBalanceUser1.minus(approveAmount));
     (await theToken.balanceOf(user2)).should.be.bignumber.equal(preBalanceUser2.plus(approveAmount));
-    await theToken.transferFrom(user1, user2, 1, { from: user2 }).should.be.rejectedWith(EVMThrow);
+    await reverting(theToken.transferFrom(user1, user2, 1, { from: user2 }));
   });
 
   it("should allow to transfer tokens to the token address.", async function () {
@@ -409,7 +409,7 @@ contract('Token funded', function (accounts) {
     expTxEvent.args.value.should.be.bignumber.equal(preBalanceUser);
     (await theToken.balanceOf(user2)).should.be.bignumber.equal(0);
     (await theToken.balanceOf(theToken.address)).should.be.bignumber.equal(preBalanceToken.plus(preBalanceUser));
-    await theToken.transfer(theToken.address, 1, { from: user2 }).should.be.rejectedWith(EVMThrow);
+    await reverting(theToken.transfer(theToken.address, 1, { from: user2 }));
   });
 
   it("should allow rescuing tokens wrongly assigned to its own address.", async function () {
