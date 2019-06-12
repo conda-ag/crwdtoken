@@ -30,7 +30,7 @@ contract CrwdTimelock {
         require(msg.sender == controller);
         assignedBalance = assignedBalance.sub(balances[_beneficiary]);
         //balanceOf(this) will be 0 until the Operational Phase has been reached, no need for explicit check
-        require(token.balanceOf(this) >= assignedBalance.add(_amount));
+        require(token.balanceOf(address(this)) >= assignedBalance.add(_amount));
         balances[_beneficiary] = _amount;
         //balance is set, not added, gives _controller the power to set any balance, even 0
         assignedBalance = assignedBalance.add(balances[_beneficiary]);

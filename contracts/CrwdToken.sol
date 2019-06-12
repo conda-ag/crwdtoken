@@ -140,7 +140,7 @@ contract CrwdToken is StandardToken {
     //this is the main funding function, it updates the balances of tokens during the ICO.
     //no particular incentive schemes have been implemented here
     //it is only accessible during the "ICO" phase.
-    function() public payable
+    function() external payable
     requireState(States.Ico)
     {
         require(whitelist[msg.sender] == true);
@@ -163,7 +163,7 @@ contract CrwdToken is StandardToken {
         soldTokens = soldTokens.add(amount);
         totalSupply_ = totalSupply_.add(amount.mul(100).div(percentForSale));
         emit Mint(beneficiary, amount);
-        emit Transfer(0x0, beneficiary, amount);
+        emit Transfer(address(0x0), beneficiary, amount);
     }
 
     function issuePercentToReserve(address beneficiary, uint256 percentOfSold)
@@ -172,7 +172,7 @@ contract CrwdToken is StandardToken {
         uint256 amount = totalSupply_.mul(percentOfSold).div(100);
         balances[beneficiary] = balances[beneficiary].add(amount);
         emit Mint(beneficiary, amount);
-        emit Transfer(0x0, beneficiary, amount);
+        emit Transfer(address(0x0), beneficiary, amount);
     }
 
     function addBonus(uint256 basisTokens)
@@ -373,7 +373,7 @@ contract CrwdToken is StandardToken {
     onlyTokenAssignmentControl
     requireState(States.Operational)
     {
-        _foreignToken.transfer(_to, _foreignToken.balanceOf(this));
+        _foreignToken.transfer(_to, _foreignToken.balanceOf(address(this)));
     }
     /**
     END ICO functions
