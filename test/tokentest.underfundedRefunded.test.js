@@ -99,7 +99,7 @@ contract('TokenContract underfunded and refund.', function (accounts) {
     const pre = web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.be.rejected;
     const post = web3.eth.getBalance(user1);
-    post.minus(pre).should.be.bignumber.equal(0);
+    post.sub(pre).should.be.bignumber.equal(0);
   });
 
   it("should move to underfunded state at end of ICO.", async function () {
@@ -116,14 +116,14 @@ contract('TokenContract underfunded and refund.', function (accounts) {
     const pre = web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.not.be.rejected;
     const post = web3.eth.getBalance(user1);
-    post.minus(pre).should.be.bignumber.equal(user1SendFunds);
+    post.sub(pre).should.be.bignumber.equal(user1SendFunds);
   });
 
   it("should not let users get their refund twice in underfunded state.", async function () {
     const pre = web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.be.rejected;
     const post = web3.eth.getBalance(user1);
-    post.minus(pre).should.be.bignumber.equal(0);
+    post.sub(pre).should.be.bignumber.equal(0);
   });
 
 
@@ -131,7 +131,7 @@ contract('TokenContract underfunded and refund.', function (accounts) {
     const pre = web3.eth.getBalance(user3);
     await theToken.requestRefund({ from: user3, gasPrice: 0 }).should.be.rejected;
     const post = web3.eth.getBalance(user3);
-    post.minus(pre).should.be.bignumber.equal(0);
+    post.sub(pre).should.be.bignumber.equal(0);
   });
 
 

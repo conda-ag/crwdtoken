@@ -391,7 +391,7 @@ contract('Token funded', function (accounts) {
     expTxEvent.args.from.should.be.equal(user1);
     expTxEvent.args.to.should.be.equal(user2);
     expTxEvent.args.value.should.be.bignumber.equal(approveAmount);
-    (await theToken.balanceOf(user1)).should.be.bignumber.equal(preBalanceUser1.minus(approveAmount));
+    (await theToken.balanceOf(user1)).should.be.bignumber.equal(preBalanceUser1.sub(approveAmount));
     (await theToken.balanceOf(user2)).should.be.bignumber.equal(preBalanceUser2.add(approveAmount));
     await reverting(theToken.transferFrom(user1, user2, 1, { from: user2 }));
   });
@@ -453,7 +453,7 @@ contract('Token funded', function (accounts) {
     (await timelock.balances(user1)).should.be.bignumber.equal(tokenAssginmentUser1_post);
     (await timelock.assignedBalance()).should.be.bignumber.equal(tokenAssginmentUser1_post + tokenAssginmentUser2);
     // Now try assigning just more than we have available.
-    let aBitTooMuch = timelockAmount.minus(await timelock.assignedBalance()).add(1);
+    let aBitTooMuch = timelockAmount.sub(await timelock.assignedBalance()).add(1);
     await timelock.assignToBeneficiary(user3, aBitTooMuch, { from: ownerLockedTeam }).should.be.rejectedWith(revert);
     // Release still does not work as it's still timelocked.
     await timelock.release(user1).should.be.rejectedWith(revert);
@@ -465,7 +465,7 @@ contract('Token funded', function (accounts) {
     (await timelock.balances(user1)).should.be.bignumber.equal(0);
     (await timelock.assignedBalance()).should.be.bignumber.equal(tokenAssginmentUser2);
     (await theToken.balanceOf(user1)).should.be.bignumber.equal(user1balance_pre.add(tokenAssginmentUser1_post));
-    (await theToken.balanceOf(timelockAddress)).should.be.bignumber.equal(timelockAmount.minus(tokenAssginmentUser1_post));
+    (await theToken.balanceOf(timelockAddress)).should.be.bignumber.equal(timelockAmount.sub(tokenAssginmentUser1_post));
   });
 
   // modifiers should reject out of range values
@@ -820,7 +820,7 @@ contract('TokenContract underfunded and refund.', function (accounts) {
     const pre = web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.be.rejected;
     const post = web3.eth.getBalance(user1);
-    post.minus(pre).should.be.bignumber.equal(0);
+    post.sub(pre).should.be.bignumber.equal(0);
   });
 
   it("should move to underfunded state at end of ICO.", async function () {
@@ -837,14 +837,14 @@ contract('TokenContract underfunded and refund.', function (accounts) {
     const pre = web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.not.be.rejected;
     const post = web3.eth.getBalance(user1);
-    post.minus(pre).should.be.bignumber.equal(user1SendFunds);
+    post.sub(pre).should.be.bignumber.equal(user1SendFunds);
   });
 
   it("should not let users get their refund twice in underfunded state.", async function () {
     const pre = web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.be.rejected;
     const post = web3.eth.getBalance(user1);
-    post.minus(pre).should.be.bignumber.equal(0);
+    post.sub(pre).should.be.bignumber.equal(0);
   });
 
 
@@ -852,7 +852,7 @@ contract('TokenContract underfunded and refund.', function (accounts) {
     const pre = web3.eth.getBalance(user3);
     await theToken.requestRefund({ from: user3, gasPrice: 0 }).should.be.rejected;
     const post = web3.eth.getBalance(user3);
-    post.minus(pre).should.be.bignumber.equal(0);
+    post.sub(pre).should.be.bignumber.equal(0);
   });
 
 
@@ -973,7 +973,7 @@ contract('TokenContract paused and restarted and aborted', function (accounts) {
     const pre = web3.eth.getBalance(user1);
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.not.be.rejected;
     const post = web3.eth.getBalance(user1);
-    post.minus(pre).should.be.bignumber.equal(user1SendFunds);
+    post.sub(pre).should.be.bignumber.equal(user1SendFunds);
   });
 
 });
