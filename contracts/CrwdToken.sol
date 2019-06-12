@@ -163,7 +163,7 @@ contract CrwdToken is StandardToken {
         soldTokens = soldTokens.add(amount);
         totalSupply_ = totalSupply_.add(amount.mul(100).div(percentForSale));
         emit Mint(beneficiary, amount);
-        Transfer(0x0, beneficiary, amount);
+        emit Transfer(0x0, beneficiary, amount);
     }
 
     function issuePercentToReserve(address beneficiary, uint256 percentOfSold)
@@ -172,7 +172,7 @@ contract CrwdToken is StandardToken {
         uint256 amount = totalSupply_.mul(percentOfSold).div(100);
         balances[beneficiary] = balances[beneficiary].add(amount);
         emit Mint(beneficiary, amount);
-        Transfer(0x0, beneficiary, amount);
+        emit Transfer(0x0, beneficiary, amount);
     }
 
     function addBonus(uint256 basisTokens)
