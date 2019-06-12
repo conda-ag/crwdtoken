@@ -1,6 +1,8 @@
 import { reverting } from "./helpers/compare.js";
 import { deployTokenJustLikeInMigrations } from './helpers/deployTokenHelper.js'
 
+const { ether } = require("./helpers/currency.js");
+
 import {
   advanceBlock,
   advanceToBlock,
@@ -36,9 +38,9 @@ contract('Token funded', function (accounts) {
   const user2 = accounts[10];
   const user3 = accounts[11];
 
-  const user1SendFunds = web3.toWei("1", "ether");
+  const user1SendFunds = ether("1");
 
-  const weiICOMaximum = web3.toWei("100000", "ether");
+  const weiICOMaximum = ether("100000");
   const weiICOMinimum = 0;
 
   const silencePeriod = 5;
@@ -180,7 +182,7 @@ contract('Token funded', function (accounts) {
   });
 
   it("should fail to accept funds during silence period.", async function () {
-    await theToken.sendTransaction({ from: user1, value: web3.toWei("1", "ether") }).should.be.rejectedWith(revert);
+    await theToken.sendTransaction({ from: user1, value: ether("1") }).should.be.rejectedWith(revert);
     await advanceToBlock(currentBlockNumber + 23);
   });
 
@@ -216,12 +218,12 @@ contract('Token funded', function (accounts) {
   it("should fail to accept funds above the limit from whitelisted address user1.", async function () {
     await theToken.sendTransaction({
       from: user1,
-      value: weiICOMaximum + web3.toWei("1", "ether")
+      value: weiICOMaximum + ether("1")
     }).should.be.rejectedWith(revert);
   });
 
   it("should have the correct bonus applied when bonus phase is on.", async function () {
-    const oneKTokens = (new BigNumber(web3.toWei("1", "ether"))).mul(1000);
+    const oneKTokens = (new BigNumber(ether("1"))).mul(1000);
     (await theToken.addBonus(oneKTokens.mul(1))).dividedBy(oneKTokens).should.be.bignumber.equal(1);
     await theToken.setBonusPhase(true, { from: expectedStateControl });
     (await theToken.bonusPhase()).should.be.equal(true);
@@ -298,7 +300,7 @@ contract('Token funded', function (accounts) {
 
   it("should reject funds from whitelisted address user1 after ICO timeout.", async function () {
     // make sure another investment works before the time jump, after which it is rejected.
-    const investAmount = web3.toWei("0.001", "ether");
+    const investAmount = ether("0.001");
     await theToken.sendTransaction({ from: user1, value: investAmount }).should.not.be.rejected;
     web3.eth.getBalance(theToken.address).should.be.bignumber.below((new BigNumber(weiICOMaximum)).sub(investAmount));
     await advanceToBlock(endBlock + 1);
@@ -306,7 +308,7 @@ contract('Token funded', function (accounts) {
   });
 
   it("should reject ETH withdrawal when still in ICO phase.", async function () {
-    const withdrawAmount = (new BigNumber(web3.toWei("0.1", "ether")));
+    const withdrawAmount = (new BigNumber(ether("0.1")));
     await theToken.requestPayout(withdrawAmount, { from: expectedWithdraw }).should.be.rejectedWith(revert);
   });
 
@@ -352,7 +354,7 @@ contract('Token funded', function (accounts) {
   });
 
   it("should allow ETH withdrawal after ICO.", async function () {
-    const withdrawAmount = (new BigNumber(web3.toWei("0.1", "ether")));
+    const withdrawAmount = (new BigNumber(ether("0.1")));
     const preBalance = web3.eth.getBalance(theToken.address);
     preBalance.should.be.bignumber.above(withdrawAmount);
     const withdrawPreBalance = web3.eth.getBalance(expectedWithdraw);
@@ -366,7 +368,7 @@ contract('Token funded', function (accounts) {
   });
 
   it("should allow setting allowance and allowed user to transferFrom() the tokens.", async function () {
-    const approveAmount = (new BigNumber(web3.toWei("0.1", "ether")));
+    const approveAmount = (new BigNumber(ether("0.1")));
     const callResult = await theToken.approve(user2, approveAmount, { from: user1 }).should.not.be.rejected;
     const expAllowEvent = callResult.logs[0];
     expAllowEvent.event.should.be.equal('Approval');
@@ -489,10 +491,10 @@ contract('Token funded and stopped by admin and operational.', function (account
   const user2 = accounts[10];
   const user3 = accounts[11];
 
-  const weiICOMaximum = web3.toWei("100001", "ether");
-  const weiICOMinimum = web3.toWei("0", "ether");
+  const weiICOMaximum = ether("100001");
+  const weiICOMinimum = ether("0");
 
-  const user1SendFunds = web3.toWei("1", "ether");
+  const user1SendFunds = ether("1");
 
   // this data structure must be kept in sync with States enum in the token's .sol
   const States = {
@@ -573,8 +575,8 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
   const user2 = accounts[10];
   const user3 = accounts[11];
 
-  const weiICOMaximum = web3.toWei("0.64", "ether");
-  const weiICOMinimum = web3.toWei("0.064", "ether");
+  const weiICOMaximum = ether("0.64");
+  const weiICOMinimum = ether("0.064");
 
   // this data structure must be kept in sync with States enum in the token's .sol
   const States = {
@@ -629,7 +631,7 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
     const preBalance = web3.eth.getBalance(theToken.address);
     preBalance.should.be.bignumber.equal(0);
     let currentBalance = new BigNumber("0");
-    const user1SendFunds = web3.toWei("0.001", "ether");
+    const user1SendFunds = ether("0.001");
     isUser1Whitelisted.should.equal(true);
     for (let i = 0; i < 100; i++) {
       await theToken.sendTransaction({ from: user1, value: user1SendFunds }).should.not.be.rejected;
@@ -639,7 +641,7 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
     }
     const postBalance = web3.eth.getBalance(theToken.address);
     let remaining = new BigNumber(weiICOMaximum).sub(postBalance);
-    let aBitTooMuch = remaining.add(web3.toWei("0.001", "ether"));
+    let aBitTooMuch = remaining.add(ether("0.001"));
     await theToken.sendTransaction({ from: user1, value: aBitTooMuch }).should.be.rejected;
     await theToken.sendTransaction({ from: user1, value: remaining }).should.not.be.rejected;
     const finalBalance = web3.eth.getBalance(theToken.address);
@@ -673,10 +675,10 @@ contract('Token funded and stopped by admin and underfunded.', function (account
   const user2 = accounts[10];
   const user3 = accounts[11];
 
-  const weiICOMaximum = web3.toWei("100001", "ether");
-  const weiICOMinimum = web3.toWei("100000", "ether");
+  const weiICOMaximum = ether("100001");
+  const weiICOMinimum = ether("100000");
 
-  const user1SendFunds = web3.toWei("1", "ether");
+  const user1SendFunds = ether("1");
 
   // this data structure must be kept in sync with States enum in the token's .sol
   const States = {
@@ -757,10 +759,10 @@ contract('TokenContract underfunded and refund.', function (accounts) {
   const user2 = accounts[10];
   const user3 = accounts[11];
 
-  const weiICOMaximum = web3.toWei("100001", "ether");
-  const weiICOMinimum = web3.toWei("100000", "ether");
+  const weiICOMaximum = ether("100001");
+  const weiICOMinimum = ether("100000");
 
-  const user1SendFunds = web3.toWei("1", "ether");
+  const user1SendFunds = ether("1");
 
   // this data structure must be kept in sync with States enum in the token's .sol
   const States = {
@@ -830,7 +832,7 @@ contract('TokenContract underfunded and refund.', function (accounts) {
   });
 
   it("should reject new funding in underfunded state.", async function () {
-    await theToken.sendTransaction({ from: user1, value: web3.toWei("1", "ether") }).should.be.rejectedWith(revert);
+    await theToken.sendTransaction({ from: user1, value: ether("1") }).should.be.rejectedWith(revert);
   });
 
   it("should let users get their refund in underfunded state.", async function () {
@@ -875,10 +877,10 @@ contract('TokenContract paused and restarted and aborted', function (accounts) {
   const user2 = accounts[10];
   const user3 = accounts[11];
 
-  const weiICOMaximum = web3.toWei("100001", "ether");
-  const weiICOMinimum = web3.toWei("100000", "ether");
+  const weiICOMaximum = ether("100001");
+  const weiICOMinimum = ether("100000");
 
-  const user1SendFunds = web3.toWei("1", "ether");
+  const user1SendFunds = ether("1");
 
   // this data structure must be kept in sync with States enum in the token's .sol
   const States = {
@@ -966,7 +968,7 @@ contract('TokenContract paused and restarted and aborted', function (accounts) {
   });
 
   it("should reject new funding in underfunded state.", async function () {
-    await theToken.sendTransaction({ from: user1, value: web3.toWei("1", "ether") }).should.be.rejectedWith(revert);
+    await theToken.sendTransaction({ from: user1, value: ether("1") }).should.be.rejectedWith(revert);
   });
 
   it("should let users withdraw funds in underfunded state.", async function () {

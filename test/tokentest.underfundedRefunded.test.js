@@ -1,5 +1,7 @@
 import { deployTokenJustLikeInMigrations } from './helpers/deployTokenHelper.js'
 
+const { ether } = require("./helpers/currency.js");
+
 import {
   advanceBlock,
   advanceToBlock,
@@ -36,10 +38,10 @@ contract('TokenContract underfunded and refund.', function (accounts) {
   const user2 = accounts[10];
   const user3 = accounts[11];
 
-  const weiICOMaximum = web3.toWei("100001", "ether");
-  const weiICOMinimum = web3.toWei("100000", "ether");
+  const weiICOMaximum = ether("100001");
+  const weiICOMinimum = ether("100000");
 
-  const user1SendFunds = web3.toWei("1", "ether");
+  const user1SendFunds = ether("1");
 
   // this data structure must be kept in sync with States enum in the token's .sol
   const States = {
@@ -109,7 +111,7 @@ contract('TokenContract underfunded and refund.', function (accounts) {
   });
 
   it("should reject new funding in underfunded state.", async function () {
-    await theToken.sendTransaction({ from: user1, value: web3.toWei("1", "ether") }).should.be.rejectedWith(revert);
+    await theToken.sendTransaction({ from: user1, value: ether("1") }).should.be.rejectedWith(revert);
   });
 
   it("should let users get their refund in underfunded state.", async function () {

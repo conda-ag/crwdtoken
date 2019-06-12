@@ -1,5 +1,7 @@
 import { deployTokenJustLikeInMigrations } from './helpers/deployTokenHelper.js'
 
+const { ether } = require("./helpers/currency.js");
+
 import {
   advanceBlock,
   advanceToBlock,
@@ -36,8 +38,8 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
   const user2 = accounts[10];
   const user3 = accounts[11];
 
-  const weiICOMaximum = web3.toWei("0.64", "ether");
-  const weiICOMinimum = web3.toWei("0.064", "ether");
+  const weiICOMaximum = ether("0.64");
+  const weiICOMinimum = ether("0.064");
 
   // this data structure must be kept in sync with States enum in the token's .sol
   const States = {
@@ -92,7 +94,7 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
     const preBalance = web3.eth.getBalance(theToken.address);
     preBalance.should.be.bignumber.equal(0);
     let currentBalance = new BigNumber("0");
-    const user1SendFunds = web3.toWei("0.001", "ether");
+    const user1SendFunds = ether("0.001");
     isUser1Whitelisted.should.equal(true);
     for (let i = 0; i < 100; i++) {
       await theToken.sendTransaction({ from: user1, value: user1SendFunds }).should.not.be.rejected;
@@ -102,7 +104,7 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
     }
     const postBalance = web3.eth.getBalance(theToken.address);
     let remaining = new BigNumber(weiICOMaximum).sub(postBalance);
-    let aBitTooMuch = remaining.add(web3.toWei("0.001", "ether"));
+    let aBitTooMuch = remaining.add(ether("0.001"));
     await theToken.sendTransaction({ from: user1, value: aBitTooMuch }).should.be.rejected;
     await theToken.sendTransaction({ from: user1, value: remaining }).should.not.be.rejected;
     const finalBalance = web3.eth.getBalance(theToken.address);
