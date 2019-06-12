@@ -36,10 +36,10 @@ contract('Token funded and stopped by admin and operational.', function (account
   const user2 = accounts[10];
   const user3 = accounts[11];
 
-  const weiICOMaximum = web3.toWei(100001, "ether");
-  const weiICOMinimum = web3.toWei(0, "ether");
+  const weiICOMaximum = web3.toWei("100001", "ether");
+  const weiICOMinimum = web3.toWei("0", "ether");
 
-  const user1SendFunds = web3.toWei(1, "ether");
+  const user1SendFunds = web3.toWei("1", "ether");
 
   // this data structure must be kept in sync with States enum in the token's .sol
   const States = {
@@ -71,7 +71,7 @@ contract('Token funded and stopped by admin and operational.', function (account
   });
 
   it("should accept valid min and max values with correct key.", async function () {
-    await theToken.updateEthICOThresholds(weiICOMinimum, weiICOMaximum, 0, endBlock, { from: expectedStateControl }).should.not.be.rejected;
+    await theToken.updateEthICOThresholds(weiICOMinimum, weiICOMaximum, "0", endBlock, { from: expectedStateControl }).should.not.be.rejected;
     (await theToken.weiICOMinimum()).should.be.bignumber.equal(weiICOMinimum);
     (await theToken.weiICOMaximum()).should.be.bignumber.equal(weiICOMaximum);
     (await theToken.endBlock()).should.be.bignumber.equal(endBlock);

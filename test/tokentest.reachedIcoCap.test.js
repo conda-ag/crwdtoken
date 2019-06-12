@@ -36,8 +36,8 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
   const user2 = accounts[10];
   const user3 = accounts[11];
 
-  const weiICOMaximum = web3.toWei(0.64, "ether");
-  const weiICOMinimum = web3.toWei(0.064, "ether");
+  const weiICOMaximum = web3.toWei("0.64", "ether");
+  const weiICOMinimum = web3.toWei("0.064", "ether");
 
   // this data structure must be kept in sync with States enum in the token's .sol
   const States = {
@@ -69,7 +69,7 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
   });
 
   it("should accept valid min and max values with correct key.", async function () {
-    await theToken.updateEthICOThresholds(weiICOMinimum, weiICOMaximum, 0, endBlock, { from: expectedStateControl }).should.not.be.rejected;
+    await theToken.updateEthICOThresholds(weiICOMinimum, weiICOMaximum, "0", endBlock, { from: expectedStateControl }).should.not.be.rejected;
     (await theToken.weiICOMinimum()).should.be.bignumber.equal(weiICOMinimum);
     (await theToken.weiICOMaximum()).should.be.bignumber.equal(weiICOMaximum);
     (await theToken.endBlock()).should.be.bignumber.equal(endBlock);
@@ -91,8 +91,8 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
     let isUser1Whitelisted = await theToken.whitelist(user1);
     const preBalance = web3.eth.getBalance(theToken.address);
     preBalance.should.be.bignumber.equal(0);
-    let currentBalance = new BigNumber(0);
-    const user1SendFunds = web3.toWei(0.001, "ether");
+    let currentBalance = new BigNumber("0");
+    const user1SendFunds = web3.toWei("0.001", "ether");
     isUser1Whitelisted.should.equal(true);
     for (let i = 0; i < 100; i++) {
       await theToken.sendTransaction({ from: user1, value: user1SendFunds }).should.not.be.rejected;
@@ -102,7 +102,7 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
     }
     const postBalance = web3.eth.getBalance(theToken.address);
     let remaining = new BigNumber(weiICOMaximum).minus(postBalance);
-    let aBitTooMuch = remaining.plus(web3.toWei(0.001, "ether"));
+    let aBitTooMuch = remaining.plus(web3.toWei("0.001", "ether"));
     await theToken.sendTransaction({ from: user1, value: aBitTooMuch }).should.be.rejected;
     await theToken.sendTransaction({ from: user1, value: remaining }).should.not.be.rejected;
     const finalBalance = web3.eth.getBalance(theToken.address);
