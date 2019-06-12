@@ -33,7 +33,6 @@
   },
   "homepage": "https://conda.online/",
   "dependencies": {
-    "truffle-hdwallet-provider": "^1.0.6",
     "truffle-test-helpers": "0.0.4"
   },
   "devDependencies": {
@@ -50,6 +49,7 @@
     "openzeppelin-solidity": "^2.3.0",
     "solidity-coverage": "^0.5.11",
     "truffle": "4.1.11",
+    "truffle-hdwallet-provider": "^1.0.6",
     "web3": "^0.20.7"
   }
 }
