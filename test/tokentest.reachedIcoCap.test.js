@@ -2,6 +2,8 @@ import { deployTokenJustLikeInMigrations } from './helpers/deployTokenHelper.js'
 
 const { ether } = require("./helpers/currency.js");
 
+import { States } from './helpers/tokenStates.js'
+
 import {
   advanceBlock,
   advanceToBlock,
@@ -42,16 +44,6 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
 
   const weiICOMaximum = ether("0.64");
   const weiICOMinimum = ether("0.064");
-
-  // this data structure must be kept in sync with States enum in the token's .sol
-  const States = {
-    Initial: 0, // deployment time
-    ValuationSet: 1, // whitelist addresses, accept funds, update balances
-    Ico: 2, // whitelist addresses, accept funds, update balances
-    Underfunded: 3, // ICO time finished and minimal amount not raised
-    Operational: 4, // production phase
-    Paused: 5         // for contract upgrades
-  }
 
   // must be adapted with number of tests
   let endBlock; //set in before()
