@@ -19,14 +19,14 @@ contract CrwdTimelock {
 
     CrwdToken token;
 
-    function CrwdTimelock(CrwdToken _token, address _controller, uint _releaseTime) {
+    function CrwdTimelock(CrwdToken _token, address _controller, uint _releaseTime) public {
         require(_releaseTime > now);
         token = _token;
         controller = _controller;
         releaseTime = _releaseTime;
     }
 
-    function assignToBeneficiary(address _beneficiary, uint256 _amount) {
+    function assignToBeneficiary(address _beneficiary, uint256 _amount) public {
         require(msg.sender == controller);
         assignedBalance = assignedBalance.sub(balances[_beneficiary]);
         //balanceOf(this) will be 0 until the Operational Phase has been reached, no need for explicit check
@@ -39,7 +39,7 @@ contract CrwdTimelock {
     /**
      * @notice Transfers tokens held by timelock to beneficiary.
      */
-    function release(address _beneficiary) {
+    function release(address _beneficiary) public {
         require(now >= releaseTime);
         uint amount = balances[_beneficiary];
         require(amount > 0);

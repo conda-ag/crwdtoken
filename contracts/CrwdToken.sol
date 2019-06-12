@@ -84,7 +84,7 @@ contract CrwdToken is StandardToken {
     , address _lockedTeam //15%
     , address _lockedDev //10%
     , address _lockedCountry //10%
-    ) {
+    ) public {
         stateControl = _stateControl;
         whitelistControl = _whitelistControl;
         withdrawControl = _withdrawControl;
@@ -140,7 +140,7 @@ contract CrwdToken is StandardToken {
     //this is the main funding function, it updates the balances of tokens during the ICO.
     //no particular incentive schemes have been implemented here
     //it is only accessible during the "ICO" phase.
-    function() payable
+    function() public payable
     requireState(States.Ico)
     {
         require(whitelist[msg.sender] == true);
@@ -194,6 +194,7 @@ contract CrwdToken is StandardToken {
     uint256 constant per_mill = 1000;
 
     function setBonusPhase(bool _isBonusPhase)
+    public
     onlyStateControl
         //phases are controlled manually through the state control key
     {
@@ -224,6 +225,7 @@ contract CrwdToken is StandardToken {
     // silencePeriod is a number of blocks to wait after starting the ICO. No funds are accepted during the silence period. It can be set to zero.
     // newEndBlock is the absolute block number at which the ICO must stop. It must be set after now + silence period.
     function updateEthICOThresholds(uint256 _newWeiICOMinimum, uint256 _newWeiICOMaximum, uint256 _silencePeriod, uint256 _newEndBlock)
+    public
     onlyStateControl
     {
         require(state == States.Initial || state == States.ValuationSet);
@@ -241,6 +243,7 @@ contract CrwdToken is StandardToken {
     }
 
     function startICO()
+    public
     onlyStateControl
     requireState(States.ValuationSet)
     {
@@ -251,6 +254,7 @@ contract CrwdToken is StandardToken {
     }
 
     function addPresaleAmount(address beneficiary, uint256 amount)
+    public
     onlyTokenAssignmentControl
     {
         require(state == States.ValuationSet || state == States.Ico);
@@ -259,6 +263,7 @@ contract CrwdToken is StandardToken {
 
 
     function endICO()
+    public
     onlyStateControl
     requireState(States.Ico)
     {
@@ -272,6 +277,7 @@ contract CrwdToken is StandardToken {
     }
 
     function anyoneEndICO()
+    public
     requireState(States.Ico)
     {
         require(block.number > endBlock);
@@ -303,6 +309,7 @@ contract CrwdToken is StandardToken {
     }
 
     function addToWhitelist(address _whitelisted)
+    public
     onlyWhitelist
         //    requireState(States.Ico)
     {
@@ -313,6 +320,7 @@ contract CrwdToken is StandardToken {
 
     //emergency pause for the ICO
     function pause()
+    public
     onlyStateControl
     requireState(States.Ico)
     {
@@ -321,6 +329,7 @@ contract CrwdToken is StandardToken {
 
     //in case we want to completely abort
     function abort()
+    public
     onlyStateControl
     requireState(States.Paused)
     {
@@ -329,6 +338,7 @@ contract CrwdToken is StandardToken {
 
     //un-pause
     function resumeICO()
+    public
     onlyStateControl
     requireState(States.Paused)
     {
@@ -337,6 +347,7 @@ contract CrwdToken is StandardToken {
 
     //in case of a failed/aborted ICO every investor can get back their money
     function requestRefund()
+    public
     requireState(States.Underfunded)
     {
         require(ethPossibleRefunds[msg.sender] > 0);
@@ -349,6 +360,7 @@ contract CrwdToken is StandardToken {
 
     //after the ico has run its course, the withdraw account can drain funds bit-by-bit as needed.
     function requestPayout(uint _amount)
+    public
     onlyWithdraw //very important!
     requireState(States.Operational)
     {
@@ -357,6 +369,7 @@ contract CrwdToken is StandardToken {
 
     //if this contract gets a balance in some other ERC20 contract - or even iself - then we can rescue it.
     function rescueToken(ERC20Basic _foreignToken, address _to)
+    public
     onlyTokenAssignmentControl
     requireState(States.Operational)
     {
@@ -370,18 +383,21 @@ contract CrwdToken is StandardToken {
     BEGIN ERC20 functions
     */
     function transfer(address _to, uint256 _value)
+    public
     requireState(States.Operational)
     returns (bool success) {
         return super.transfer(_to, _value);
     }
 
     function transferFrom(address _from, address _to, uint256 _value)
+    public
     requireState(States.Operational)
     returns (bool success) {
         return super.transferFrom(_from, _to, _value);
     }
 
     function balanceOf(address _account)
+    public
     constant
     returns (uint256 balance) {
         return balances[_account];
