@@ -136,7 +136,7 @@ contract('Token funded', function (accounts) {
     (await theToken.weiICOMaximum()).should.be.bignumber.equal(weiICOMaximum);
     (await theToken.endBlock()).should.be.bignumber.equal(endBlock);
     (await theToken.silencePeriod()).should.be.bignumber.equal(silencePeriod);
-    (await theToken.ETH_CRWDTOKEN()).should.be.bignumber.equal((await theToken.maxTotalSupply()).times(await theToken.percentForSale()).div(100).div(weiICOMaximum));
+    (await theToken.ETH_CRWDTOKEN()).should.be.bignumber.equal((await theToken.maxTotalSupply()).mul(await theToken.percentForSale()).div(100).div(weiICOMaximum));
     (await theToken.state()).should.be.bignumber.equal(States.ValuationSet);
   });
 
@@ -194,7 +194,7 @@ contract('Token funded', function (accounts) {
     const newBalance = web3.eth.getBalance(theToken.address);
     preBalance.add(etherSentToContract).should.be.bignumber.equal(newBalance);
     const expectedBonusFactor = 1.0; // bonusPhase is off, so we can always expect 1.0 here.
-    const expectedTokenAmount = (await theToken.ETH_CRWDTOKEN()).times(etherSentToContract).times(expectedBonusFactor);
+    const expectedTokenAmount = (await theToken.ETH_CRWDTOKEN()).mul(etherSentToContract).mul(expectedBonusFactor);
     const expMintEvent = callResult.logs[0];
     // Mint(to: 0xb106a247aa0452d4b73c37e4d215568e604793c0, amount: 225000000000000000000)
     expMintEvent.event.should.be.equal('Mint');
@@ -220,8 +220,8 @@ contract('Token funded', function (accounts) {
   });
 
   it("should have the correct bonus applied when bonus phase is on.", async function () {
-    const oneKTokens = (new BigNumber(web3.toWei("1", "ether"))).times(1000);
-    (await theToken.addBonus(oneKTokens.times(1))).dividedBy(oneKTokens).should.be.bignumber.equal(1);
+    const oneKTokens = (new BigNumber(web3.toWei("1", "ether"))).mul(1000);
+    (await theToken.addBonus(oneKTokens.mul(1))).dividedBy(oneKTokens).should.be.bignumber.equal(1);
     await theToken.setBonusPhase(true, { from: expectedStateControl });
     (await theToken.bonusPhase()).should.be.equal(true);
     let expectedBonuses = [
@@ -250,7 +250,7 @@ contract('Token funded', function (accounts) {
       { ktokens: 900, factor: 1.300 },
     ];
     for (let bonus of expectedBonuses) {
-      (await theToken.addBonus(oneKTokens.times(bonus.ktokens))).dividedBy(oneKTokens.times(bonus.ktokens)).should.be.bignumber.equal(bonus.factor);
+      (await theToken.addBonus(oneKTokens.mul(bonus.ktokens))).dividedBy(oneKTokens.mul(bonus.ktokens)).should.be.bignumber.equal(bonus.factor);
     }
     await theToken.setBonusPhase(false, { from: expectedStateControl });
     (await theToken.bonusPhase()).should.be.equal(false);
@@ -273,7 +273,7 @@ contract('Token funded', function (accounts) {
     expTxEvent.args.value.should.be.bignumber.equal(presaleAmount);
     (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.add(presaleAmount));
     (await theToken.soldTokens()).should.be.bignumber.equal(soldBefore.add(presaleAmount));
-    (await theToken.totalSupply()).should.be.bignumber.equal(totalBefore.add(presaleAmount.times(100).div(await theToken.percentForSale())));
+    (await theToken.totalSupply()).should.be.bignumber.equal(totalBefore.add(presaleAmount.mul(100).div(await theToken.percentForSale())));
     // addPresaleAmount should not allow integer overflow! We try with a value that would overflow to 1
     const targetedHugeAmount = (new BigNumber("2")).pow(256).sub(balanceBefore.add(presaleAmount)).add(1);
     await reverting(theToken.addPresaleAmount(user2, targetedHugeAmount, { from: expectedTokenAssignmentControl }));
@@ -313,7 +313,7 @@ contract('Token funded', function (accounts) {
     (await theToken.state()).should.be.bignumber.equal(States.Ico);
     const callResult = await theToken.anyoneEndICO().should.not.be.rejected;
     let totalSupply = await theToken.totalSupply();
-    (await theToken.soldTokens()).times(100).dividedBy(totalSupply).should.be.bignumber.equal(await theToken.percentForSale());
+    (await theToken.soldTokens()).mul(100).dividedBy(totalSupply).should.be.bignumber.equal(await theToken.percentForSale());
     // We issue to multiple reserves buckets, we get Mint and Trasfer events for each.
     const reservesBuckets = [
       { address: await theToken.teamTimeLock(), percent: 15 },
@@ -325,13 +325,13 @@ contract('Token funded', function (accounts) {
       const expMintEvent = callResult.logs[i * 2];
       expMintEvent.event.should.be.equal('Mint');
       expMintEvent.args.to.should.be.equal(reservesBuckets[i].address);
-      expMintEvent.args.amount.times(100).dividedBy(totalSupply).should.be.bignumber.equal(reservesBuckets[i].percent);
+      expMintEvent.args.amount.mul(100).dividedBy(totalSupply).should.be.bignumber.equal(reservesBuckets[i].percent);
       const expTxEvent = callResult.logs[i * 2 + 1];
       expTxEvent.event.should.be.equal('Transfer');
       expTxEvent.args.from.should.be.equal('0x0000000000000000000000000000000000000000');
       expTxEvent.args.to.should.be.equal(reservesBuckets[i].address);
-      expTxEvent.args.value.times(100).dividedBy(totalSupply).should.be.bignumber.equal(reservesBuckets[i].percent);
-      (await theToken.balanceOf(reservesBuckets[i].address)).times(100).dividedBy(totalSupply).should.be.bignumber.equal(reservesBuckets[i].percent);
+      expTxEvent.args.value.mul(100).dividedBy(totalSupply).should.be.bignumber.equal(reservesBuckets[i].percent);
+      (await theToken.balanceOf(reservesBuckets[i].address)).mul(100).dividedBy(totalSupply).should.be.bignumber.equal(reservesBuckets[i].percent);
     }
     const expFinishedEvent = callResult.logs[reservesBuckets.length * 2];
     expFinishedEvent.event.should.be.equal('MintFinished');
@@ -359,7 +359,7 @@ contract('Token funded', function (accounts) {
     await theToken.requestPayout(withdrawAmount).should.be.rejectedWith(revert);
     const callResult = await theToken.requestPayout(withdrawAmount, { from: expectedWithdraw }).should.not.be.rejected;
     const tx = await web3.eth.getTransaction(callResult.tx);
-    const txCost = tx.gasPrice.times(callResult.receipt.gasUsed);
+    const txCost = tx.gasPrice.mul(callResult.receipt.gasUsed);
     web3.eth.getBalance(theToken.address).should.be.bignumber.equal(preBalance.sub(withdrawAmount));
     web3.eth.getBalance(expectedWithdraw).should.be.bignumber.equal(withdrawPreBalance.add(withdrawAmount).sub(txCost));
   });
