@@ -75,7 +75,7 @@ contract CrwdToken is StandardToken {
 
 
     //this creates the contract and stores the owner. it also passes in 3 addresses to be used later during the lifetime of the contract.
-    function CrwdToken(
+    constructor(
         address _stateControl
     , address _whitelistControl
     , address _withdrawControl

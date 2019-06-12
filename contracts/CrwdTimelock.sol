@@ -19,7 +19,7 @@ contract CrwdTimelock {
 
     CrwdToken token;
 
-    function CrwdTimelock(CrwdToken _token, address _controller, uint _releaseTime) public {
+    constructor(CrwdToken _token, address _controller, uint _releaseTime) public {
         require(_releaseTime > now);
         token = _token;
         controller = _controller;
