@@ -147,7 +147,7 @@ contract('Token funded', function (accounts) {
     // fails from others than the token assignment control account
     await theToken.addPresaleAmount(user2, presaleAmount).should.be.rejectedWith(revert);
     await theToken.addPresaleAmount(user2, presaleAmount, { from: expectedTokenAssignmentControl }).should.not.be.rejected;
-    (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.plus(presaleAmount));
+    (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.add(presaleAmount));
   });
 
   it("should start ICO.", async function () {
@@ -193,7 +193,7 @@ contract('Token funded', function (accounts) {
     const sendTransaction = theToken.sendTransaction({ from: user1, value: etherSentToContract });
     const callResult = await sendTransaction.should.not.be.rejected;
     const newBalance = web3.eth.getBalance(theToken.address);
-    preBalance.plus(etherSentToContract).should.be.bignumber.equal(newBalance);
+    preBalance.add(etherSentToContract).should.be.bignumber.equal(newBalance);
     const expectedBonusFactor = 1.0; // bonusPhase is off, so we can always expect 1.0 here.
     const expectedTokenAmount = (await theToken.ETH_CRWDTOKEN()).times(etherSentToContract).times(expectedBonusFactor);
     const expMintEvent = callResult.logs[0];
@@ -272,13 +272,13 @@ contract('Token funded', function (accounts) {
     expTxEvent.args.from.should.be.equal('0x0000000000000000000000000000000000000000'); // on this specific token contract!
     expTxEvent.args.to.should.be.equal(user2);
     expTxEvent.args.value.should.be.bignumber.equal(presaleAmount);
-    (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.plus(presaleAmount));
-    (await theToken.soldTokens()).should.be.bignumber.equal(soldBefore.plus(presaleAmount));
-    (await theToken.totalSupply()).should.be.bignumber.equal(totalBefore.plus(presaleAmount.times(100).div(await theToken.percentForSale())));
+    (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.add(presaleAmount));
+    (await theToken.soldTokens()).should.be.bignumber.equal(soldBefore.add(presaleAmount));
+    (await theToken.totalSupply()).should.be.bignumber.equal(totalBefore.add(presaleAmount.times(100).div(await theToken.percentForSale())));
     // addPresaleAmount should not allow integer overflow! We try with a value that would overflow to 1
-    const targetedHugeAmount = (new BigNumber("2")).pow(256).sub(balanceBefore.plus(presaleAmount)).plus(1);
+    const targetedHugeAmount = (new BigNumber("2")).pow(256).sub(balanceBefore.add(presaleAmount)).add(1);
     await reverting(theToken.addPresaleAmount(user2, targetedHugeAmount, { from: expectedTokenAssignmentControl }));
-    (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.plus(presaleAmount));
+    (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.add(presaleAmount));
   });
 
   it("should reject assignment and release inside of a timelock contract.", async function () {
@@ -362,7 +362,7 @@ contract('Token funded', function (accounts) {
     const tx = await web3.eth.getTransaction(callResult.tx);
     const txCost = tx.gasPrice.times(callResult.receipt.gasUsed);
     web3.eth.getBalance(theToken.address).should.be.bignumber.equal(preBalance.sub(withdrawAmount));
-    web3.eth.getBalance(expectedWithdraw).should.be.bignumber.equal(withdrawPreBalance.plus(withdrawAmount).sub(txCost));
+    web3.eth.getBalance(expectedWithdraw).should.be.bignumber.equal(withdrawPreBalance.add(withdrawAmount).sub(txCost));
   });
 
   it("should allow setting allowance and allowed user to transferFrom() the tokens.", async function () {
@@ -383,7 +383,7 @@ contract('Token funded', function (accounts) {
     preBalanceUser1.should.be.bignumber.above(approveAmount);
     // Sending to wrong users, too high amounts, or from others than the recipient fails.
     await reverting(theToken.transferFrom(user1, user3, approveAmount, { from: user3 }));
-    await reverting(theToken.transferFrom(user1, user2, approveAmount.plus(1), { from: user2 }));
+    await reverting(theToken.transferFrom(user1, user2, approveAmount.add(1), { from: user2 }));
     await reverting(theToken.transferFrom(user1, user2, approveAmount));
     const callResult = await theToken.transferFrom(user1, user2, approveAmount, { from: user2 }).should.not.be.rejected;
     const expTxEvent = callResult.logs[0];
@@ -392,7 +392,7 @@ contract('Token funded', function (accounts) {
     expTxEvent.args.to.should.be.equal(user2);
     expTxEvent.args.value.should.be.bignumber.equal(approveAmount);
     (await theToken.balanceOf(user1)).should.be.bignumber.equal(preBalanceUser1.minus(approveAmount));
-    (await theToken.balanceOf(user2)).should.be.bignumber.equal(preBalanceUser2.plus(approveAmount));
+    (await theToken.balanceOf(user2)).should.be.bignumber.equal(preBalanceUser2.add(approveAmount));
     await reverting(theToken.transferFrom(user1, user2, "1", { from: user2 }));
   });
 
@@ -409,7 +409,7 @@ contract('Token funded', function (accounts) {
     expTxEvent.args.to.should.be.equal(theToken.address);
     expTxEvent.args.value.should.be.bignumber.equal(preBalanceUser);
     (await theToken.balanceOf(user2)).should.be.bignumber.equal(0);
-    (await theToken.balanceOf(theToken.address)).should.be.bignumber.equal(preBalanceToken.plus(preBalanceUser));
+    (await theToken.balanceOf(theToken.address)).should.be.bignumber.equal(preBalanceToken.add(preBalanceUser));
     await reverting(theToken.transfer(theToken.address, "1", { from: user2 }));
   });
 
@@ -424,7 +424,7 @@ contract('Token funded', function (accounts) {
     expTxEvent.args.to.should.be.equal(user1);
     expTxEvent.args.value.should.be.bignumber.equal(preBalanceToken);
     (await theToken.balanceOf(theToken.address)).should.be.bignumber.equal(0);
-    (await theToken.balanceOf(user1)).should.be.bignumber.equal(preBalanceToken.plus(preBalanceUser));
+    (await theToken.balanceOf(user1)).should.be.bignumber.equal(preBalanceToken.add(preBalanceUser));
   });
 
   it("should allow assignment inside of a timelock contract.", async function () {
@@ -436,7 +436,7 @@ contract('Token funded', function (accounts) {
     const tokenAssginmentUser2 = 5000;
     timelockAmount.should.be.bignumber.above(tokenAssginmentUser1 + tokenAssginmentUser2);
     // assigning more than the contract has should fail.
-    await timelock.assignToBeneficiary(user1, timelockAmount.plus(1), { from: ownerLockedTeam }).should.be.rejected;
+    await timelock.assignToBeneficiary(user1, timelockAmount.add(1), { from: ownerLockedTeam }).should.be.rejected;
     (await timelock.balances(user1)).should.be.bignumber.equal(0);
     (await timelock.assignedBalance()).should.be.bignumber.equal(0);
     // Should be rejected when "anyone" calls it, succeed when contract owner is the caller.
@@ -453,7 +453,7 @@ contract('Token funded', function (accounts) {
     (await timelock.balances(user1)).should.be.bignumber.equal(tokenAssginmentUser1_post);
     (await timelock.assignedBalance()).should.be.bignumber.equal(tokenAssginmentUser1_post + tokenAssginmentUser2);
     // Now try assigning just more than we have available.
-    let aBitTooMuch = timelockAmount.minus(await timelock.assignedBalance()).plus(1);
+    let aBitTooMuch = timelockAmount.minus(await timelock.assignedBalance()).add(1);
     await timelock.assignToBeneficiary(user3, aBitTooMuch, { from: ownerLockedTeam }).should.be.rejectedWith(revert);
     // Release still does not work as it's still timelocked.
     await timelock.release(user1).should.be.rejectedWith(revert);
@@ -464,7 +464,7 @@ contract('Token funded', function (accounts) {
     await timelock.release(user1).should.not.be.rejected;
     (await timelock.balances(user1)).should.be.bignumber.equal(0);
     (await timelock.assignedBalance()).should.be.bignumber.equal(tokenAssginmentUser2);
-    (await theToken.balanceOf(user1)).should.be.bignumber.equal(user1balance_pre.plus(tokenAssginmentUser1_post));
+    (await theToken.balanceOf(user1)).should.be.bignumber.equal(user1balance_pre.add(tokenAssginmentUser1_post));
     (await theToken.balanceOf(timelockAddress)).should.be.bignumber.equal(timelockAmount.minus(tokenAssginmentUser1_post));
   });
 
