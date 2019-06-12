@@ -1,7 +1,7 @@
 /*
 Implements ERC 20 Token standard: https://github.com/ethereum/EIPs/issues/20.
 */
-pragma solidity ^0.4.24;
+pragma solidity >=0.4.24;
 
 import "./zeppelin_v1_12_0/StandardToken.sol";
 import "./CrwdTimelock.sol";

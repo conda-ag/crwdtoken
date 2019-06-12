@@ -1,6 +1,6 @@
 //1:1 copy from https://github.com/OpenZeppelin/openzeppelin-solidity/blob/v1.12.0/contracts/token/ERC20/ERC20.sol
 
-pragma solidity ^0.4.24;
+pragma solidity >=0.4.24;
 
 import "./ERC20Basic.sol";
 
