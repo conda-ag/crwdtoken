@@ -162,7 +162,7 @@ contract CrwdToken is StandardToken {
         balances[beneficiary] = balances[beneficiary].add(amount);
         soldTokens = soldTokens.add(amount);
         totalSupply = totalSupply.add(amount.mul(100).div(percentForSale));
-        Mint(beneficiary, amount);
+        emit Mint(beneficiary, amount);
         Transfer(0x0, beneficiary, amount);
     }
 
@@ -171,7 +171,7 @@ contract CrwdToken is StandardToken {
     {
         uint256 amount = totalSupply.mul(percentOfSold).div(100);
         balances[beneficiary] = balances[beneficiary].add(amount);
-        Mint(beneficiary, amount);
+        emit Mint(beneficiary, amount);
         Transfer(0x0, beneficiary, amount);
     }
 
@@ -216,7 +216,7 @@ contract CrwdToken is StandardToken {
     function moveToState(States _newState)
     internal
     {
-        StateTransition(state, _newState);
+        emit StateTransition(state, _newState);
         state = _newState;
     }
     // ICO contract configuration function
@@ -305,7 +305,7 @@ contract CrwdToken is StandardToken {
         .add(balances[miscNotLocked]);
 
         mintingFinished = true;
-        MintFinished();
+        emit MintFinished();
     }
 
     function addToWhitelist(address _whitelisted)
@@ -314,7 +314,7 @@ contract CrwdToken is StandardToken {
         //    requireState(States.Ico)
     {
         whitelist[_whitelisted] = true;
-        Whitelisted(_whitelisted);
+        emit Whitelisted(_whitelisted);
     }
 
 
