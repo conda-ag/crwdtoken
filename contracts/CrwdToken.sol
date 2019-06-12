@@ -4,7 +4,7 @@ Implements ERC 20 Token standard: https://github.com/ethereum/EIPs/issues/20.
 pragma solidity ^0.4.11;
 
 
-import "zeppelin/token/StandardToken.sol";
+import "./zeppelin_v1_12_0/StandardToken.sol";
 import "./CrwdTimelock.sol";
 import "./Bonus.sol";
 
@@ -95,7 +95,7 @@ contract CrwdToken is StandardToken {
         weiICOMaximum = 0;
         endBlock = 0;
         ETH_CRWDTOKEN = 0;
-        totalSupply = 0;
+        totalSupply_ = 0;
         soldTokens = 0;
         uint releaseTime = now + 9 * 31 days;
         teamTimeLock = address(new CrwdTimelock(this, _lockedTeam, releaseTime));
@@ -161,7 +161,7 @@ contract CrwdToken is StandardToken {
     {
         balances[beneficiary] = balances[beneficiary].add(amount);
         soldTokens = soldTokens.add(amount);
-        totalSupply = totalSupply.add(amount.mul(100).div(percentForSale));
+        totalSupply_ = totalSupply_.add(amount.mul(100).div(percentForSale));
         emit Mint(beneficiary, amount);
         Transfer(0x0, beneficiary, amount);
     }
@@ -169,7 +169,7 @@ contract CrwdToken is StandardToken {
     function issuePercentToReserve(address beneficiary, uint256 percentOfSold)
     internal
     {
-        uint256 amount = totalSupply.mul(percentOfSold).div(100);
+        uint256 amount = totalSupply_.mul(percentOfSold).div(100);
         balances[beneficiary] = balances[beneficiary].add(amount);
         emit Mint(beneficiary, amount);
         Transfer(0x0, beneficiary, amount);
@@ -298,7 +298,7 @@ contract CrwdToken is StandardToken {
         issuePercentToReserve(countryTimeLock, 10);
         issuePercentToReserve(miscNotLocked, 15);
 
-        totalSupply = soldTokens
+        totalSupply_ = soldTokens
         .add(balances[teamTimeLock])
         .add(balances[devTimeLock])
         .add(balances[countryTimeLock])

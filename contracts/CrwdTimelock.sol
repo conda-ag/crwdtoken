@@ -1,7 +1,7 @@
 pragma solidity ^0.4.11;
 
 
-import 'zeppelin/token/ERC20Basic.sol';
+import './zeppelin_v1_12_0/ERC20Basic.sol';
 import './CrwdToken.sol';
 
 
