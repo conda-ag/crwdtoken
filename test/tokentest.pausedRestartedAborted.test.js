@@ -225,7 +225,7 @@ contract('Token funded', function (accounts) {
 
   it("should have the correct bonus applied when bonus phase is on.", async function () {
     const oneKTokens = (new BigNumber(ether("1"))).mul(1000);
-    expect((await theToken.addBonus(oneKTokens.mul(1))).dividedBy(oneKTokens)).to.be.bignumber.equal(1);
+    expect((await theToken.addBonus(oneKTokens.mul(1))).div(oneKTokens)).to.be.bignumber.equal(1);
     await theToken.setBonusPhase(true, { from: expectedStateControl });
     (await theToken.bonusPhase()).should.be.equal(true);
     let expectedBonuses = [
@@ -254,7 +254,7 @@ contract('Token funded', function (accounts) {
       { ktokens: 900, factor: 1.300 },
     ];
     for (let bonus of expectedBonuses) {
-      expect((await theToken.addBonus(oneKTokens.mul(bonus.ktokens))).dividedBy(oneKTokens.mul(bonus.ktokens))).to.be.bignumber.equal(bonus.factor);
+      expect((await theToken.addBonus(oneKTokens.mul(bonus.ktokens))).div(oneKTokens.mul(bonus.ktokens))).to.be.bignumber.equal(bonus.factor);
     }
     await theToken.setBonusPhase(false, { from: expectedStateControl });
     (await theToken.bonusPhase()).should.be.equal(false);
@@ -317,7 +317,7 @@ contract('Token funded', function (accounts) {
     expect(await theToken.state()).to.be.bignumber.equal(States.Ico);
     const callResult = await theToken.anyoneEndICO().should.not.be.rejected;
     let totalSupply = await theToken.totalSupply();
-    expect((await theToken.soldTokens()).mul(100).dividedBy(totalSupply)).to.be.bignumber.equal(await theToken.percentForSale());
+    expect((await theToken.soldTokens()).mul(100).div(totalSupply)).to.be.bignumber.equal(await theToken.percentForSale());
     // We issue to multiple reserves buckets, we get Mint and Trasfer events for each.
     const reservesBuckets = [
       { address: await theToken.teamTimeLock(), percent: 15 },
@@ -329,13 +329,13 @@ contract('Token funded', function (accounts) {
       const expMintEvent = callResult.logs[i * 2];
       expMintEvent.event.should.be.equal('Mint');
       expMintEvent.args.to.should.be.equal(reservesBuckets[i].address);
-      expect(expMintEvent.args.amount.mul(100).dividedBy(totalSupply)).to.be.bignumber.equal(reservesBuckets[i].percent);
+      expect(expMintEvent.args.amount.mul(100).div(totalSupply)).to.be.bignumber.equal(reservesBuckets[i].percent);
       const expTxEvent = callResult.logs[i * 2 + 1];
       expTxEvent.event.should.be.equal('Transfer');
       expTxEvent.args.from.should.be.equal('0x0000000000000000000000000000000000000000');
       expTxEvent.args.to.should.be.equal(reservesBuckets[i].address);
-      expect(expTxEvent.args.value.mul(100).dividedBy(totalSupply)).to.be.bignumber.equal(reservesBuckets[i].percent);
-      expect((await theToken.balanceOf(reservesBuckets[i].address)).mul(100).dividedBy(totalSupply)).to.be.bignumber.equal(reservesBuckets[i].percent);
+      expect(expTxEvent.args.value.mul(100).div(totalSupply)).to.be.bignumber.equal(reservesBuckets[i].percent);
+      expect((await theToken.balanceOf(reservesBuckets[i].address)).mul(100).div(totalSupply)).to.be.bignumber.equal(reservesBuckets[i].percent);
     }
     const expFinishedEvent = callResult.logs[reservesBuckets.length * 2];
     expFinishedEvent.event.should.be.equal('MintFinished');
