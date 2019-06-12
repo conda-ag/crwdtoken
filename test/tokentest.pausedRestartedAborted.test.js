@@ -260,7 +260,7 @@ contract('Token funded', function (accounts) {
     const balanceBefore = (await theToken.balanceOf(user2));
     const soldBefore = (await theToken.soldTokens());
     const totalBefore = (await theToken.totalSupply());
-    const presaleAmount = new BigNumber(1000);
+    const presaleAmount = new BigNumber("1000");
     const callResult = await theToken.addPresaleAmount(user2, presaleAmount, { from: expectedTokenAssignmentControl }).should.not.be.rejected;
     const expMintEvent = callResult.logs[0];
     expMintEvent.event.should.be.equal('Mint');
@@ -275,7 +275,7 @@ contract('Token funded', function (accounts) {
     (await theToken.soldTokens()).should.be.bignumber.equal(soldBefore.plus(presaleAmount));
     (await theToken.totalSupply()).should.be.bignumber.equal(totalBefore.plus(presaleAmount.times(100).div(await theToken.percentForSale())));
     // addPresaleAmount should not allow integer overflow! We try with a value that would overflow to 1
-    const targetedHugeAmount = (new BigNumber(2)).pow(256).minus(balanceBefore.plus(presaleAmount)).plus(1);
+    const targetedHugeAmount = (new BigNumber("2")).pow(256).minus(balanceBefore.plus(presaleAmount)).plus(1);
     await reverting(theToken.addPresaleAmount(user2, targetedHugeAmount, { from: expectedTokenAssignmentControl }));
     (await theToken.balanceOf(user2)).should.be.bignumber.equal(balanceBefore.plus(presaleAmount));
   });
