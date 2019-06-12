@@ -144,8 +144,8 @@ contract CrwdToken is StandardToken {
     requireState(States.Ico)
     {
         require(whitelist[msg.sender] == true);
-        require(this.balance <= weiICOMaximum);
-        //note that msg.value is already included in this.balance
+        require(address(this).balance <= weiICOMaximum);
+        //note that msg.value is already included in address(this).balance
         require(block.number < endBlock);
         require(block.number >= startAcceptingFundsBlock);
 
@@ -267,7 +267,7 @@ contract CrwdToken is StandardToken {
     onlyStateControl
     requireState(States.Ico)
     {
-        if (this.balance < weiICOMinimum) {
+        if (address(this).balance < weiICOMinimum) {
             moveToState(States.Underfunded);
         }
         else {
@@ -281,7 +281,7 @@ contract CrwdToken is StandardToken {
     requireState(States.Ico)
     {
         require(block.number > endBlock);
-        if (this.balance < weiICOMinimum) {
+        if (address(this).balance < weiICOMinimum) {
             moveToState(States.Underfunded);
         }
         else {
