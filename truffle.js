@@ -3,6 +3,8 @@ require('babel-polyfill');
 
 module.exports = {
     solc: {
+        version: "0.5.0", //don't use nightly
+        docker: false,
         optimizer: {
             enabled: true,
             runs: 200
