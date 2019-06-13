@@ -5,6 +5,7 @@
   "main": "truffle.js",
   "scripts": {
     "test": "./node_modules/.bin/truffle test",
+    "test-docker": "./node_modules/.bin/truffle test --network docker",
     "console": "truffle console",
     "coverage": "scripts/coverage.sh",
     "coveralls": "scripts/coveralls.sh"

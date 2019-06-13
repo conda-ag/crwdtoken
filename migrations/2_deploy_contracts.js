@@ -37,7 +37,7 @@ module.exports = function (deployer, network, account) {
         lockedDev = "0x398e5bbf2759d0e351833a69bb0000cf6fead3a1";
         lockedCountry = "0xb32f2bad20f1032442042fa65fd3497666923143";
 
-    } else if (network === "development") {
+    } else if (network === "development" || network === "docker") {
         // testrpc
         doNotUse = account[0];
         stateControl = account[1];

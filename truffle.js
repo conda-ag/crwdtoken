@@ -16,12 +16,21 @@ module.exports = {
             port: 8545,
             // port: 30303,
             network_id: "*", // Match any network id
+            gas: 4700000,
+            verboseRpc: true
+        },
+        docker: {
+            host: "ganache",
+            port: 8545,
+            network_id: "*",
+            gas: 4700000,
             verboseRpc: true
         },
         ropsten: {
             host: "localhost",
             port: 8545,
             network_id: "3",
+            gas: 4700000,
             verboseRpc: true,
 
         },
@@ -29,6 +38,7 @@ module.exports = {
             host: "localhost",
             port: 8545,
             network_id: "1",
+            gas: 4700000,
             verboseRpc: true
         },
         coverage: {

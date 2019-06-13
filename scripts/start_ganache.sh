@@ -1,13 +1,7 @@
 #!/bin/bash
 
-# todo: delete ganache persistent database every time before starting ganache
-# it seems this version does not know about --db flag to force db path.
-# Avoid using account 0, it is default account to send messages from when running tests.
-rm -rf .myganache
-mkdir .myganache
 # Use e.g. --gasLimit 8000000 to test higher gas limits.
 ganache-cli -d -m "rebel year fine public bright armor sugar biology federal morning ozone scene" \
-     --db .myganache \
      --account="0x8355a2b28d30a83e9cb84a47a82e2feb2ccb380d7db55d76cd00b82bf765f600,100000000000000000000" \
      --account="0x57e577bbd7e9b292f8cf64efdad804aa7a2dc3f4ee4674270667f96a43dfed81,100000000000000000000" \
      --account="0x39ef678f276b2b51dda8952b8f83b9551c26bee9a62876da82f1adfc678ddcd7,100000000000000000000" \
@@ -21,8 +15,3 @@ ganache-cli -d -m "rebel year fine public bright armor sugar biology federal mor
      --account="0x39ea1f98a8ad35dd1b82e1c6eb583d86a7d904e375930ca7aefe0f7529e0c1da,100000000000000000000" \
      --account="0x821f93cd3f080b576e4b5d991e07c1a655d3fd942d0a3806ccffcd72c9d3ee68,100000000000000000000" \
       -g 1 
-
-
-# previous account 4 balances
-#      --account="0xda7200eff1e4299feb4d396e04180cf25c3634478527c201009ab1af9676942d,100010000000000000000000" \
-
