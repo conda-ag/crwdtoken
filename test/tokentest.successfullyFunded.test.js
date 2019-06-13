@@ -2,6 +2,7 @@ import { reverting } from "./helpers/compare.js";
 import { deployTokenJustLikeInMigrations } from './helpers/deployTokenHelper.js'
 
 const { ether } = require("./helpers/currency.js");
+let { wmul } = require("./helpers/calc.js");
 
 import { States } from './helpers/tokenStates.js'
 
@@ -246,9 +247,14 @@ contract('Token funded', function (accounts) {
       { ktokens: 100, factor: 1.300 },
       { ktokens: 900, factor: 1.300 },
     ];
+
     for (let bonus of expectedBonuses) {
-      expect((await theToken.addBonus(oneKTokens.mul(bonus.ktokens))).div(oneKTokens.mul(bonus.ktokens))).to.be.bignumber.equal(bonus.factor);
+      const tokens = wmul(oneKTokens, ether(bonus.ktokens.toString()));
+      const expected = wmul(tokens, ether(bonus.factor.toString()));
+      const actual = await theToken.addBonus(wmul(oneKTokens, ether(bonus.ktokens.toString())));
+      expect(actual).to.be.bignumber.equal(expected);
     }
+
     await theToken.setBonusPhase(false, { from: expectedStateControl });
     (await theToken.bonusPhase()).should.be.equal(false);
   });
