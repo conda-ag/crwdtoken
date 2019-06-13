@@ -1,4 +1,5 @@
-//1:1 copy from https://github.com/OpenZeppelin/openzeppelin-solidity/blob/v1.12.0/contracts/token/ERC20/StandardToken.sol
+//copy from https://github.com/OpenZeppelin/openzeppelin-solidity/blob/v1.12.0/contracts/token/ERC20/StandardToken.sol
+//changes: upgraded pragma
 
 pragma solidity ^0.5.0;
 
