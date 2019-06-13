@@ -132,6 +132,11 @@ contract CrwdToken is StandardToken {
         _;
     }
 
+    modifier requireAnyOfTwoStates(States _requiredState1, States _requiredState2) {
+        require(state == _requiredState1 || state == _requiredState2);
+        _;
+    }
+
     /**
     BEGIN ICO functions
     */
@@ -383,14 +388,14 @@ contract CrwdToken is StandardToken {
     */
     function transfer(address _to, uint256 _value)
     public
-    requireState(States.Operational)
+    requireAnyOfTwoStates(States.Operational, States.Ico)
     returns (bool success) {
         return super.transfer(_to, _value);
     }
 
     function transferFrom(address _from, address _to, uint256 _value)
     public
-    requireState(States.Operational)
+    requireAnyOfTwoStates(States.Operational, States.Ico)
     returns (bool success) {
         return super.transferFrom(_from, _to, _value);
     }
