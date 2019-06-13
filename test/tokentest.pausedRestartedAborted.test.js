@@ -19,7 +19,7 @@ import { BigNumber } from './helpers/customBN.js'
 
 require('chai')
   .use(require('chai-as-promised'))
-  .use(require('chai-bignumber')(BigNumber))
+  .use(require('chai-bn')(BigNumber))
   .should();
 
 const { expect } = require('chai');
@@ -58,8 +58,8 @@ contract('TokenContract paused and restarted and aborted', function (accounts) {
     console.log("redeploying...")
     theToken = await deployTokenJustLikeInMigrations(accounts);
 
-    currentBlockNumber = (await web3.eth.getBlock("latest")).number;
-    endBlock = currentBlockNumber + 20;
+    currentBlockNumber = new BigNumber(((await web3.eth.getBlock("latest")).number).toString());
+    endBlock = currentBlockNumber.add(new BigNumber("20"));
   })
 
   it("should be in Initial state", async function () {
@@ -127,9 +127,9 @@ contract('TokenContract paused and restarted and aborted', function (accounts) {
   });
 
   it("should let users withdraw funds in underfunded state.", async function () {
-    const pre = await web3.eth.getBalance(user1);
+    const pre = new BigNumber(await web3.eth.getBalance(user1));
     await theToken.requestRefund({ from: user1, gasPrice: 0 }).should.not.be.rejected;
-    const post = await web3.eth.getBalance(user1);
+    const post = new BigNumber(await web3.eth.getBalance(user1));
     expect(post.sub(pre)).to.be.bignumber.equal(user1SendFunds);
   });
 

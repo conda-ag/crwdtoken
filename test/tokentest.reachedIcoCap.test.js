@@ -18,7 +18,7 @@ import { BigNumber } from './helpers/customBN.js'
 
 require('chai')
   .use(require('chai-as-promised'))
-  .use(require('chai-bignumber')(BigNumber))
+  .use(require('chai-bn')(BigNumber))
   .should();
 
 const { expect } = require('chai');
@@ -56,8 +56,8 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
     console.log("redeploying...")
     theToken = await deployTokenJustLikeInMigrations(accounts);
 
-    currentBlockNumber = (await web3.eth.getBlock("latest")).number;
-    endBlock = currentBlockNumber + 200;
+    currentBlockNumber = new BigNumber(((await web3.eth.getBlock("latest")).number).toString());
+    endBlock = currentBlockNumber.add(new BigNumber("200"));
   })
 
   it("should be in Initial state", async function () {
@@ -85,23 +85,23 @@ contract('TokenContract accepts large numbers of ICO invests small and large but
 
   it("should accept lots of small funds from  whitelisted address user1.", async function () {
     let isUser1Whitelisted = await theToken.whitelist(user1);
-    const preBalance = await web3.eth.getBalance(theToken.address);
-    expect(preBalance).to.be.bignumber.equal(0);
+    const preBalance = new BigNumber(await web3.eth.getBalance(theToken.address));
+    expect(preBalance).to.be.bignumber.equal(new BigNumber("0"));
     let currentBalance = new BigNumber("0");
     const user1SendFunds = ether("0.001");
     isUser1Whitelisted.should.equal(true);
     for (let i = 0; i < 100; i++) {
       await theToken.sendTransaction({ from: user1, value: user1SendFunds }).should.not.be.rejected;
-      const postBalance = await web3.eth.getBalance(theToken.address);
+      const postBalance = new BigNumber(await web3.eth.getBalance(theToken.address));
       currentBalance = currentBalance.add(user1SendFunds);
       expect(currentBalance).to.be.bignumber.equal(postBalance);
     }
-    const postBalance = await web3.eth.getBalance(theToken.address);
+    const postBalance = new BigNumber(await web3.eth.getBalance(theToken.address));
     let remaining = new BigNumber(weiICOMaximum).sub(postBalance);
     let aBitTooMuch = remaining.add(ether("0.001"));
     await theToken.sendTransaction({ from: user1, value: aBitTooMuch }).should.be.rejected;
     await theToken.sendTransaction({ from: user1, value: remaining }).should.not.be.rejected;
-    const finalBalance = await web3.eth.getBalance(theToken.address);
+    const finalBalance = new BigNumber(await web3.eth.getBalance(theToken.address));
     currentBalance = currentBalance.add(remaining);
     expect(currentBalance).to.be.bignumber.equal(finalBalance);
 

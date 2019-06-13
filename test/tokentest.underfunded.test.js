@@ -19,7 +19,7 @@ import { BigNumber } from './helpers/customBN.js'
 
 require('chai')
   .use(require('chai-as-promised'))
-  .use(require('chai-bignumber')(BigNumber))
+  .use(require('chai-bn')(BigNumber))
   .should();
 
 const { expect } = require('chai');
@@ -59,8 +59,8 @@ contract('Token funded and stopped by admin and underfunded.', function (account
     console.log("redeploying...")
     theToken = await deployTokenJustLikeInMigrations(accounts);
 
-    currentBlockNumber = (await web3.eth.getBlock("latest")).number;
-    endBlock = currentBlockNumber + 20;
+    currentBlockNumber = new BigNumber(((await web3.eth.getBlock("latest")).number).toString());
+    endBlock = currentBlockNumber.add(new BigNumber("20"));
   })
 
   it("should be in Initial state", async function () {
