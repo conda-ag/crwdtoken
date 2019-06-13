@@ -142,11 +142,11 @@ contract CrwdToken is StandardToken {
     function() external payable
     requireState(States.Ico)
     {
-        require(whitelist[msg.sender] == true);
-        require(address(this).balance <= weiICOMaximum);
+        require(whitelist[msg.sender] == true, "not whitelisted");
+        require(address(this).balance <= weiICOMaximum, "weiICOMaximum");
         //note that msg.value is already included in address(this).balance
-        require(block.number < endBlock);
-        require(block.number >= startAcceptingFundsBlock);
+        require(block.number < endBlock, "endBlock reached");
+        require(block.number >= startAcceptingFundsBlock, "startBlock future");
 
         uint256 basisTokens = msg.value.mul(ETH_CRWDTOKEN);
         uint256 soldToTuserWithBonus = addBonus(basisTokens);
@@ -227,10 +227,10 @@ contract CrwdToken is StandardToken {
     public
     onlyStateControl
     {
-        require(state == States.Initial || state == States.ValuationSet);
-        require(_newWeiICOMaximum > _newWeiICOMinimum);
-        require(block.number + silencePeriod < _newEndBlock);
-        require(block.number < _newEndBlock);
+        require(state == States.Initial || state == States.ValuationSet, "invalid state");
+        require(_newWeiICOMaximum > _newWeiICOMinimum, "weiMax");
+        require(block.number + silencePeriod < _newEndBlock, "high silence");
+        require(block.number < _newEndBlock, "past endBock");
         weiICOMinimum = _newWeiICOMinimum;
         weiICOMaximum = _newWeiICOMaximum;
         silencePeriod = _silencePeriod;
@@ -246,8 +246,8 @@ contract CrwdToken is StandardToken {
     onlyStateControl
     requireState(States.ValuationSet)
     {
-        require(block.number < endBlock);
-        require(block.number + silencePeriod < endBlock);
+        require(block.number < endBlock, "ended");
+        require(block.number + silencePeriod < endBlock, "ended w silence");
         startAcceptingFundsBlock = block.number + silencePeriod;
         moveToState(States.Ico);
     }
@@ -256,7 +256,7 @@ contract CrwdToken is StandardToken {
     public
     onlyTokenAssignmentControl
     {
-        require(state == States.ValuationSet || state == States.Ico);
+        require(state == States.ValuationSet || state == States.Ico, "invalid token state");
         issueTokensToUser(beneficiary, amount);
     }
 
@@ -279,7 +279,7 @@ contract CrwdToken is StandardToken {
     public
     requireState(States.Ico)
     {
-        require(block.number > endBlock);
+        require(block.number > endBlock, "not ended");
         if (address(this).balance < weiICOMinimum) {
             moveToState(States.Underfunded);
         }
@@ -349,7 +349,7 @@ contract CrwdToken is StandardToken {
     public
     requireState(States.Underfunded)
     {
-        require(ethPossibleRefunds[msg.sender] > 0);
+        require(ethPossibleRefunds[msg.sender] > 0, "nothing to refund");
         //there is no need for updateAccount(msg.sender) since the token never became active.
         uint256 payout = ethPossibleRefunds[msg.sender];
         //reverse calculate the amount to pay out
