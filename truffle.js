@@ -33,13 +33,21 @@ module.exports = {
       gas: 4700000,
       verboseRpc: true
     },
-    live: {
+    kovan: {
       host: "localhost",
       port: 8545,
-      network_id: "1",
-      gas: 4700000,
+      gas: 5000000,
+      gasPrice: 10000000000,
+      network_id: 42,
       verboseRpc: true
     },
+    // live: {
+    //   host: "localhost",
+    //   port: 8545,
+    //   network_id: "1",
+    //   gas: 4700000,
+    //   verboseRpc: true
+    // },
     coverage: {
       host: "localhost",
       network_id: "*",
