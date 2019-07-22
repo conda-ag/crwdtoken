@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Use e.g. --gasLimit 8000000 to test higher gas limits.
-ganache-cli -d -m "rebel year fine public bright armor sugar biology federal morning ozone scene" \
+./node_modules/.bin/ganache-cli -d -m "rebel year fine public bright armor sugar biology federal morning ozone scene" \
      --account="0x8355a2b28d30a83e9cb84a47a82e2feb2ccb380d7db55d76cd00b82bf765f600,100000000000000000000" \
      --account="0x57e577bbd7e9b292f8cf64efdad804aa7a2dc3f4ee4674270667f96a43dfed81,100000000000000000000" \
      --account="0x39ef678f276b2b51dda8952b8f83b9551c26bee9a62876da82f1adfc678ddcd7,100000000000000000000" \

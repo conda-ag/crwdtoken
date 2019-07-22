@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.8;
 
 library Bonus {
     uint256 constant pointMultiplier = 1e18; //100% = 1*10^18 points
