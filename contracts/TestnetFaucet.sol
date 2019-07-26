@@ -29,7 +29,7 @@ contract TestnetFaucet is Ownable {
     }
 
     function mint(uint256 amount) public notDead {
-        require(_token.balanceOf(msg.sender).add(amount) < 10000000000000000000000, "balance exceeds limit - stay fair");
+        require(_token.balanceOf(msg.sender).add(amount) <= 10000000000000000000000, "balance exceeds limit - stay fair");
         _token.addToWhitelist(address(msg.sender));
         _token.addPresaleAmount(address(msg.sender), amount);
     }
