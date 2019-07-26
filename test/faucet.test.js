@@ -56,7 +56,7 @@ contract("Faucet on Testnet", accounts => {
       "0",
       (2 ^ 128).toString(),
       "0",
-      "9999999999"
+      "90000000000000000000000"
     );
   });
 
@@ -90,5 +90,16 @@ contract("Faucet on Testnet", accounts => {
       .setTokenAddress(ZERO_ADDRESS, { from: unknown })
       .should.be.rejectedWith(revert);
     assert.equal((await testnetFaucet.faucetFor()).toString(), token.address);
+  });
+
+  it("mint more than limit", async () => {
+    await testnetFaucet.mint("10000000000000000000000", { from: unknown });
+    await testnetFaucet
+      .mint("1", { from: unknown })
+      .should.be.rejectedWith(revert);
+    assert.equal(
+      (await token.balanceOf(unknown)).toString(),
+      "10000000000000000000000"
+    );
   });
 });
