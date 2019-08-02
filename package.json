@@ -6,6 +6,7 @@
   "scripts": {
     "test": "./node_modules/.bin/truffle test",
     "test-docker": "./node_modules/.bin/truffle test --network docker",
+    "migrate": "./node_modules/.bin/truffle migrate",
     "console": "truffle console",
     "coverage": "scripts/coverage.sh",
     "coveralls": "scripts/coveralls.sh"
