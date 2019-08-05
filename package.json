@@ -5,6 +5,7 @@
   "main": "truffle.js",
   "scripts": {
     "test": "./node_modules/.bin/truffle test",
+    "build": "./node_modules/.bin/truffle build",
     "test-docker": "./node_modules/.bin/truffle test --network docker",
     "migrate": "./node_modules/.bin/truffle migrate",
     "console": "truffle console",
