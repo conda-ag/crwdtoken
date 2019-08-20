@@ -24,7 +24,7 @@ module.exports = function(deployer, network, account) {
     lockedCountry = "0x576ef9cd51d9adb8295f105eeabbb326d1503ff0";
   } else if (network === "kovan") {
     console.log("used accounts for kovan testnet deployment");
-    doNotUse = "0x1E0ADf175785D84f211F1D324E66ddA437b19aC5";
+    doNotUse = "0x10cBc8f9262f3717afb50eD6A8f720B60E4B5931";
     stateControl = "0xa5aD2801C2aAf6061DCA9A1d7E30F5296FD7F461";
     whitelistControl = "0x748A76e7cc1794E90520bb761a22A167a2B710A2";
     withdrawControl = "0xC893c051E1E5510aa3801A7d6c0fEff3e6F59cf9";
