@@ -1,5 +1,23 @@
-require("babel-register");
+var HDWalletProvider = require("truffle-hdwallet-provider");
+
+require("babel-register")({
+  ignore: /node_modules\/(?!openzeppelin-solidity\/test\/helpers)/
+});
 require("babel-polyfill");
+
+let getMnemonic = () => {
+  const mnemonicJson = JSON.parse(
+    require("fs").readFileSync(__dirname + "/mnemonic.json", "utf8")
+  );
+  return mnemonicJson.mnemonic;
+};
+
+let getNode = () => {
+  const mnemonicJson = JSON.parse(
+    require("fs").readFileSync(__dirname + "/mnemonic.json", "utf8")
+  );
+  return mnemonicJson.node;
+};
 
 module.exports = {
   solc: {
@@ -27,19 +45,16 @@ module.exports = {
       verboseRpc: true
     },
     kovan: {
-      host: "localhost",
-      port: 8545,
+      provider: () => new HDWalletProvider(getMnemonic(), getNode(), 0, 10),
       gas: 5000000,
       gasPrice: 10000000000,
-      network_id: 42,
-      verboseRpc: true
+      network_id: 42
     },
     // live: {
-    //   host: "localhost",
-    //   port: 8545,
-    //   network_id: "1",
-    //   gas: 4700000,
-    //   verboseRpc: true
+    //   provider: () => new HDWalletProvider(getMnemonic(), getNode(), 0, 10),
+    //   gas: 5000000,
+    //   gasPrice: 10000000000,
+    //   network_id: 1
     // },
     coverage: {
       host: "localhost",
