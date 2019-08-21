@@ -48,13 +48,15 @@ module.exports = {
       provider: () => new HDWalletProvider(getMnemonic(), getNode(), 0, 10),
       gas: 5000000,
       gasPrice: 10000000000,
-      network_id: 42
+      network_id: 42,
+      skipDryRun: true
     },
     // live: {
     //   provider: () => new HDWalletProvider(getMnemonic(), getNode(), 0, 10),
     //   gas: 5000000,
     //   gasPrice: 10000000000,
-    //   network_id: 1
+    //   network_id: 1,
+    //   skipDryRun: true
     // },
     coverage: {
       host: "localhost",
