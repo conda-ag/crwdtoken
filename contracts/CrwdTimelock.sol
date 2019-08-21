@@ -1,7 +1,9 @@
 pragma solidity ^0.5.8;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+
 import './zeppelin_v1_12_0/ERC20Basic.sol';
-import './CrwdToken.sol';
+import './zeppelin_v1_12_0/ERC20.sol';
 
 contract CrwdTimelock {
     using SafeMath for uint256;
@@ -15,9 +17,9 @@ contract CrwdTimelock {
     // timestamp when token release is enabled
     uint public releaseTime;
 
-    CrwdToken token;
+    ERC20 token;
 
-    constructor(CrwdToken _token, address _controller, uint _releaseTime) public {
+    constructor(ERC20 _token, address _controller, uint _releaseTime) public {
         require(_releaseTime > now, "releaseTime");
         token = _token;
         controller = _controller;
