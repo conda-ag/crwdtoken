@@ -57,11 +57,13 @@ module.exports = function(deployer, network, account) {
     lockedCountry = account[8];
     gasLimit = 0xfffffffffff;
   } else {
-    throw new Error("Unknown network");
+    throw new Error(`Unknown network ${network}`);
   }
 
   if (account[0].toLowerCase() !== doNotUse.toLowerCase()) {
-    throw new Error("Unexpected deployment account0");
+    throw new Error(
+      `Unexpected account0. Is: ${account[0]}, Should: ${doNotUse}`
+    );
   }
 
   const deployedAddress = deployer.deploy(
