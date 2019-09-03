@@ -40,6 +40,7 @@ To cleanup run:
 
 To extract the ABI interface run:
 `python ./scripts/extract_abi.py --jsonfile=CrwdToken.json`
+`python ./scripts/extract_abi.py --jsonfile=TestnetFaucet.json`
 
 ## Flatten
 
