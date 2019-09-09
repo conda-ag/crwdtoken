@@ -82,7 +82,7 @@ module.exports = function(deployer, network, account) {
     } else if (network === "kovan") {
       console.log("used accounts for kovan testnet deployment");
       doNotUse = "0x10cBc8f9262f3717afb50eD6A8f720B60E4B5931";
-      stateControl = "0xa5aD2801C2aAf6061DCA9A1d7E30F5296FD7F461";
+      stateControl = "0x53d1B24dC3E010DC10B214D09D1C137b70c4F457";
       whitelistControl = "0x748A76e7cc1794E90520bb761a22A167a2B710A2";
       withdrawControl = "0xC893c051E1E5510aa3801A7d6c0fEff3e6F59cf9";
       tokenAssignmentControl = "0x29A13190C423811fA1eA9808b0d44809974dBE8a";
