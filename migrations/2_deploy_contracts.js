@@ -37,7 +37,7 @@ const configureFaucetOnTestnet = async (network, deployingTokenAddress) => {
   console.log("faucet configured");
 };
 
-const startTokenSaleOnTestnet = async (network, account) => {
+const updateThresholds = async (network, account) => {
   if (
     network === "development" ||
     network === "docker" ||
@@ -148,6 +148,6 @@ module.exports = function(deployer, network, account) {
 
     await configureFaucetOnTestnet(network, DeployingToken.address);
 
-    await startTokenSaleOnTestnet(network, account);
+    await updateThresholds(network, account);
   });
 };
