@@ -1,7 +1,13 @@
 const TestnetFaucet = artifacts.require("./TestnetFaucet.sol");
 const DeployingToken = artifacts.require("./CrwdToken.sol");
 
-const UINT256_MAX = (2 ^ 256) - 1;
+const UINT256_MAX = new web3.utils.BN("2")
+  .pow(new web3.utils.BN("256"))
+  .sub(new web3.utils.BN("1"));
+
+const UINT128_MAX = new web3.utils.BN("2")
+  .pow(new web3.utils.BN("128"))
+  .sub(new web3.utils.BN("1"));
 
 const deployFaucetOnTestnet = async (deployer, network, account) => {
   let faucet = null;
@@ -40,7 +46,7 @@ const startTokenSaleOnTestnet = async (network, account) => {
     const token = await DeployingToken.at(DeployingToken.address);
     await token.updateEthICOThresholds(
       "0",
-      (2 ^ 128).toString(),
+      UINT128_MAX.toString(),
       "0",
       UINT256_MAX.toString(),
       { from: account[1] }
