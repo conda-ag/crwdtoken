@@ -23,7 +23,7 @@ contract TestnetFaucet is Ownable {
         _token = token;
     }
 
-    function suicide() public onlyOwner {
+    function makeDead() public onlyOwner {
         _isDead = true;
         renounceOwnership();
     }

@@ -65,17 +65,17 @@ contract("Faucet on Testnet", accounts => {
     assert.equal((await token.balanceOf(unknown)).toString(), "123");
   });
 
-  it("Faucet suicide disables faucet", async () => {
-    await testnetFaucet.suicide();
+  it("Faucet makeDead disables faucet", async () => {
+    await testnetFaucet.makeDead();
     await testnetFaucet
       .mint("123", { from: unknown })
       .should.be.rejectedWith(revert);
     assert.equal((await token.balanceOf(unknown)).toString(), "0");
   });
 
-  it("Faucet suicide only by owner", async () => {
+  it("Faucet makeDead only by owner", async () => {
     await testnetFaucet
-      .suicide({ from: unknown })
+      .makeDead({ from: unknown })
       .should.be.rejectedWith(revert);
     assert.equal((await token.balanceOf(unknown)).toString(), "0");
   });
