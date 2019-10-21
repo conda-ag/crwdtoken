@@ -1,7 +1,7 @@
 //copy from https://github.com/OpenZeppelin/openzeppelin-solidity/blob/v1.12.0/contracts/token/ERC20/BasicToken.sol
 //changes: upgraded pragma, used SafeMath from current openzeppelin
 
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.12;
 
 
 import "./ERC20Basic.sol";

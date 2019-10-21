@@ -67,7 +67,6 @@ module.exports = function(deployer, network, account) {
     let lockedTeam;
     let lockedDev;
     let lockedCountry;
-    let gasLimit = 4000000;
 
     if (network === "live") {
       console.log("used accounts for live deployment");
@@ -112,7 +111,6 @@ module.exports = function(deployer, network, account) {
       lockedTeam = account[6];
       lockedDev = account[7];
       lockedCountry = account[8];
-      gasLimit = 0xfffffffffff;
     } else {
       throw new Error(`Unknown network ${network}`);
     }
@@ -133,6 +131,7 @@ module.exports = function(deployer, network, account) {
       );
     }
 
+    console.log(`deploying token...`);
     await deployer.deploy(
       DeployingToken,
       stateControl,
@@ -143,11 +142,15 @@ module.exports = function(deployer, network, account) {
       lockedTeam,
       lockedDev,
       lockedCountry,
-      { gas: gasLimit, from: account[0] }
+      { from: account[0] }
     );
 
+    console.log("deploying faucet...");
     await configureFaucetOnTestnet(network, DeployingToken.address);
 
+    console.log("deploying thresholds...");
     await updateThresholds(network, account);
+
+    console.log("deploy_contracts done");
   });
 };
