@@ -9,6 +9,11 @@ const UINT128_MAX = new web3.utils.BN("2")
   .pow(new web3.utils.BN("128"))
   .sub(new web3.utils.BN("1"));
 
+//
+// Decide if faucet should be assigned
+//
+const assignFaucetOnTestnet = true;
+
 const deployFaucetOnTestnet = async (deployer, network, account) => {
   let faucet = null;
   if (
@@ -115,20 +120,33 @@ module.exports = function(deployer, network, account) {
       throw new Error(`Unknown network ${network}`);
     }
 
+    console.log("account summary:");
+    console.log(`doNotUse ${doNotUse}`);
+    console.log(`stateControl ${stateControl}`);
+    console.log(`whitelistControl ${whitelistControl}`);
+    console.log(`withdrawControl ${withdrawControl}`);
+    console.log(`tokenAssignmentControl ${tokenAssignmentControl}`);
+    console.log(`notLocked ${notLocked}`);
+    console.log(`lockedTeam ${lockedTeam}`);
+    console.log(`lockedDev ${lockedDev}`);
+    console.log(`lockedCountry ${lockedCountry}`);
+
     if (account[0].toLowerCase() !== doNotUse.toLowerCase()) {
       throw new Error(
         `Unexpected account0. Is: ${account[0]}, Should: ${doNotUse}`
       );
     }
 
-    const faucet = await deployFaucetOnTestnet(deployer, network, account);
+    if (assignFaucetOnTestnet) {
+      const faucet = await deployFaucetOnTestnet(deployer, network, account);
 
-    if (faucet !== null) {
-      tokenAssignmentControl = faucet.address;
-      whitelistControl = faucet.address;
-      console.log(
-        `faucet override: tokenAssignmentControl and whitelistControl set to faucet ${faucet.address}`
-      );
+      if (faucet !== null) {
+        tokenAssignmentControl = faucet.address;
+        whitelistControl = faucet.address;
+        console.log(
+          `faucet override: tokenAssignmentControl and whitelistControl set to faucet ${faucet.address}`
+        );
+      }
     }
 
     console.log(`deploying token...`);
@@ -145,8 +163,10 @@ module.exports = function(deployer, network, account) {
       { from: account[0] }
     );
 
-    console.log("deploying faucet...");
-    await configureFaucetOnTestnet(network, DeployingToken.address);
+    if (assignFaucetOnTestnet) {
+      console.log("deploying faucet...");
+      await configureFaucetOnTestnet(network, DeployingToken.address);
+    }
 
     console.log("deploying thresholds...");
     await updateThresholds(network, account);
