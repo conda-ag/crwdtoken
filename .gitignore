@@ -2,7 +2,6 @@ node_modules
 mnemonic
 coverage
 undefined
-truffle-config.js
 coverageEnv
 build/*
 coverage.json
