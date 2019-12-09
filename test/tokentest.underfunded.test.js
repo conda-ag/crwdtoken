@@ -25,7 +25,7 @@ require('chai')
 const { expect } = require('chai');
 
 const TokenContract = artifacts.require("./CrwdToken.sol");
-const TimelockContract = artifacts.require("./CrwdTimelock.sol");
+// const TimelockContract = artifacts.require("./CrwdTimelock.sol");
 
 contract('Token funded and stopped by admin and underfunded.', function (accounts) {
 
