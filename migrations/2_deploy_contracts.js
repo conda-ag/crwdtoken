@@ -87,13 +87,13 @@ module.exports = function(deployer, network, account) {
       console.log("used accounts for kovan testnet deployment");
       doNotUse = "0x10cBc8f9262f3717afb50eD6A8f720B60E4B5931";
       stateControl = "0x53d1B24dC3E010DC10B214D09D1C137b70c4F457";
-      whitelistControl = "0x748A76e7cc1794E90520bb761a22A167a2B710A2";
-      withdrawControl = "0xC893c051E1E5510aa3801A7d6c0fEff3e6F59cf9";
-      tokenAssignmentControl = "0x29A13190C423811fA1eA9808b0d44809974dBE8a";
-      notLocked = "0x4AD14Bab37fEd8cbBE6e1b552aCAfe356322750F";
-      lockedTeam = "0xba7e8aE6741f6A8F0144c3D92F52A0B8Ab8Fbd43";
-      lockedDev = "0x2E10E35A784aE63AF899734437B9Ea36Ed2C1750";
-      lockedCountry = "0xf07a9Fd5e726783338E48fD8cE38c7675938A258";
+      whitelistControl = "0xC802827ea722D1Ad46Fb35c29281E7076F98DaA9";
+      withdrawControl = "0x37fc1bAF4b26e31E5834a19394F4a9aCE54EfB0c";
+      tokenAssignmentControl = "0x8A4c0Ed207D8779b4e5da9D3c6D67c7A0cF70B16";
+      notLocked = "0xb099f2584b1A263a30d763D08cA8171748Cf55E2";
+      lockedTeam = "0xd45EAfD3f28243777b05b001d72E0eB57eE8498d";
+      lockedDev = "0xf726C7C75BB52DC83cBB88CEAD9c642394027f38";
+      lockedCountry = "0xFb7b93db4ddFF6AD9096da7b4d71D61AEb810A1D";
     } else if (network === "development" || network === "docker") {
       console.log("used accounts of testrpc/ganache");
       doNotUse = account[0];
