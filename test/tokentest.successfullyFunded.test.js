@@ -26,7 +26,6 @@ require('chai')
 const { expect } = require('chai');
 
 const TokenContract = artifacts.require("./CrwdToken.sol");
-const TimelockContract = artifacts.require("./CrwdTimelock.sol");
 
 contract('Token funded', function (accounts) {
   const defaultKeyDoNotUse = accounts[0];
@@ -191,8 +190,7 @@ contract('Token funded', function (accounts) {
     const callResult = await sendTransaction.should.not.be.rejected;
     const newBalance = new BigNumber(await web3.eth.getBalance(theToken.address));
     expect(preBalance.add(etherSentToContract)).to.be.bignumber.equal(newBalance);
-    const expectedBonusFactor = new BigNumber("1"); // bonusPhase is off, so we can always expect 1.0 here.
-    const expectedTokenAmount = (await theToken.ETH_CRWDTOKEN()).mul(etherSentToContract).mul(expectedBonusFactor);
+    const expectedTokenAmount = (await theToken.ETH_CRWDTOKEN()).mul(etherSentToContract); //.mul(expectedBonusFactor);
     const expMintEvent = callResult.logs[0];
     // Mint(to: 0xb106a247aa0452d4b73c37e4d215568e604793c0, amount: 225000000000000000000)
     expMintEvent.event.should.be.equal('Mint');
@@ -217,48 +215,6 @@ contract('Token funded', function (accounts) {
     }).should.be.rejectedWith(revert);
   });
 
-  it("should have the correct bonus applied when bonus phase is on.", async function () {
-    const oneKTokens = (new BigNumber(ether("1"))).mul(new BigNumber("1000"));
-    expect((await theToken.addBonus(oneKTokens.mul(new BigNumber("1")))).div(oneKTokens)).to.be.bignumber.equal(new BigNumber("1"));
-    await theToken.setBonusPhase(true, { from: expectedStateControl });
-    (await theToken.bonusPhase()).should.be.equal(true);
-    let expectedBonuses = [
-      { ktokens: 0.1, factor: 1.200 },
-      { ktokens: 1.0, factor: 1.200 },
-      { ktokens: 1.5, factor: 1.205 },
-      { ktokens: 2.0, factor: 1.210 },
-      { ktokens: 2.5, factor: 1.215 },
-      { ktokens: 3.0, factor: 1.220 },
-      { ktokens: 4.0, factor: 1.225 },
-      { ktokens: 5.0, factor: 1.230 },
-      { ktokens: 6.0, factor: 1.235 },
-      { ktokens: 7.0, factor: 1.240 },
-      { ktokens: 8.0, factor: 1.245 },
-      { ktokens: 9.0, factor: 1.250 },
-      { ktokens: 10, factor: 1.255 },
-      { ktokens: 20, factor: 1.260 },
-      { ktokens: 30, factor: 1.265 },
-      { ktokens: 40, factor: 1.270 },
-      { ktokens: 50, factor: 1.275 },
-      { ktokens: 60, factor: 1.280 },
-      { ktokens: 70, factor: 1.285 },
-      { ktokens: 80, factor: 1.290 },
-      { ktokens: 90, factor: 1.295 },
-      { ktokens: 100, factor: 1.300 },
-      { ktokens: 900, factor: 1.300 },
-    ];
-
-    for (let bonus of expectedBonuses) {
-      const tokens = wmul(oneKTokens, ether(bonus.ktokens.toString()));
-      const expected = wmul(tokens, ether(bonus.factor.toString()));
-      const actual = await theToken.addBonus(wmul(oneKTokens, ether(bonus.ktokens.toString())));
-      expect(actual).to.be.bignumber.equal(expected);
-    }
-
-    await theToken.setBonusPhase(false, { from: expectedStateControl });
-    (await theToken.bonusPhase()).should.be.equal(false);
-  });
-
   it("should allow adding a presale amount during ICO.", async function () {
     const balanceBefore = (await theToken.balanceOf(user2));
     const soldBefore = (await theToken.soldTokens());
@@ -281,15 +237,6 @@ contract('Token funded', function (accounts) {
     const targetedHugeAmount = (new BigNumber("2")).pow(new BigNumber("256")).sub(balanceBefore.add(presaleAmount)).add(new BigNumber("1"));
     await reverting(theToken.addPresaleAmount(user2, targetedHugeAmount, { from: expectedTokenAssignmentControl }));
     expect(await theToken.balanceOf(user2)).to.be.bignumber.equal(balanceBefore.add(presaleAmount));
-  });
-
-  it("should reject assignment and release inside of a timelock contract.", async function () {
-    let timelockAddress = await theToken.teamTimeLock();
-    let timelock = await TimelockContract.at(timelockAddress);
-    expect(await theToken.balanceOf(timelockAddress)).to.be.bignumber.equal(new BigNumber("0"));
-    const tokenAssginmentAmount = new BigNumber("1000"); // depends on bonus scheme!
-    await timelock.assignToBeneficiary(user1, tokenAssginmentAmount, { from: ownerLockedTeam }).should.be.rejectedWith(revert);
-    await timelock.release(user1).should.be.rejectedWith(revert);
   });
 
   it("should fail to stop ICO by anyone before ICO timeout.", async function () {
@@ -427,47 +374,6 @@ contract('Token funded', function (accounts) {
     expect(expTxEvent.args.value).to.be.bignumber.equal(preBalanceToken);
     expect(await theToken.balanceOf(theToken.address)).to.be.bignumber.equal(new BigNumber("0"));
     expect(await theToken.balanceOf(user1)).to.be.bignumber.equal(preBalanceToken.add(preBalanceUser));
-  });
-
-  it("should allow assignment inside of a timelock contract.", async function () {
-    let timelockAddress = await theToken.teamTimeLock();
-    let timelock = await TimelockContract.at(timelockAddress);
-    let timelockAmount = (await theToken.balanceOf(timelockAddress));
-    const tokenAssginmentUser1 = new BigNumber("10000");
-    const tokenAssginmentUser1_post = new BigNumber("9000");
-    const tokenAssginmentUser2 = new BigNumber("5000");
-    expect(timelockAmount).to.be.bignumber.above(tokenAssginmentUser1 + tokenAssginmentUser2);
-    // assigning more than the contract has should fail.
-    await timelock.assignToBeneficiary(user1, timelockAmount.add(new BigNumber("1")), { from: ownerLockedTeam }).should.be.rejected;
-    expect(await timelock.balances(user1)).to.be.bignumber.equal(new BigNumber("0"));
-    expect(await timelock.assignedBalance()).to.be.bignumber.equal(new BigNumber("0"));
-    // Should be rejected when "anyone" calls it, succeed when contract owner is the caller.
-    await timelock.assignToBeneficiary(user1, tokenAssginmentUser1).should.be.rejected;
-    await timelock.assignToBeneficiary(user1, tokenAssginmentUser1, { from: ownerLockedTeam }).should.not.be.rejected;
-    expect(await timelock.balances(user1)).to.be.bignumber.equal(tokenAssginmentUser1);
-    expect(await timelock.assignedBalance()).to.be.bignumber.equal(tokenAssginmentUser1);
-    // Try a second assignment to see if assigned balance adjusts correctly.
-    await timelock.assignToBeneficiary(user2, tokenAssginmentUser2, { from: ownerLockedTeam }).should.not.be.rejected;
-    expect(await timelock.balances(user2)).to.be.bignumber.equal(tokenAssginmentUser2);
-    expect(await timelock.assignedBalance()).to.be.bignumber.equal(tokenAssginmentUser1.add(tokenAssginmentUser2));
-    // Set user1 to lower assignment to check if that works fine as well.
-    await timelock.assignToBeneficiary(user1, tokenAssginmentUser1_post, { from: ownerLockedTeam }).should.not.be.rejected;
-    expect(await timelock.balances(user1)).to.be.bignumber.equal(tokenAssginmentUser1_post);
-    expect(await timelock.assignedBalance()).to.be.bignumber.equal(tokenAssginmentUser1_post.add(tokenAssginmentUser2));
-    // Now try assigning just more than we have available.
-    let aBitTooMuch = timelockAmount.sub(await timelock.assignedBalance()).add(new BigNumber("1"));
-    await timelock.assignToBeneficiary(user3, aBitTooMuch, { from: ownerLockedTeam }).should.be.rejectedWith(revert);
-    // Release still does not work as it's still timelocked.
-    await timelock.release(user1).should.be.rejectedWith(revert);
-    // Jump blockchain to a point where timelock is lifted and we can release tokens.
-    await increaseTime(duration.days(9 * 31));
-    // Now release user1 tokens and check that everything work correctly with that.
-    let user1balance_pre = await theToken.balanceOf(user1);
-    await timelock.release(user1).should.not.be.rejected;
-    expect(await timelock.balances(user1)).to.be.bignumber.equal(new BigNumber("0"));
-    expect(await timelock.assignedBalance()).to.be.bignumber.equal(tokenAssginmentUser2);
-    expect(await theToken.balanceOf(user1)).to.be.bignumber.equal(user1balance_pre.add(tokenAssginmentUser1_post));
-    expect(await theToken.balanceOf(timelockAddress)).to.be.bignumber.equal(timelockAmount.sub(tokenAssginmentUser1_post));
   });
 
   // modifiers should reject out of range values

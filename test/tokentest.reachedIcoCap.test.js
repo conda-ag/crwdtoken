@@ -24,7 +24,6 @@ require('chai')
 const { expect } = require('chai');
 
 const TokenContract = artifacts.require("./CrwdToken.sol");
-const TimelockContract = artifacts.require("./CrwdTimelock.sol");
 
 contract('TokenContract accepts large numbers of ICO invests small and large but respects cap. Funded and stopped by admin and operational.', function (accounts) {
 

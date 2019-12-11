@@ -25,7 +25,6 @@ require('chai')
 const { expect } = require('chai');
 
 const TokenContract = artifacts.require("./CrwdToken.sol");
-const TimelockContract = artifacts.require("./CrwdTimelock.sol");
 
 contract('Token funded and stopped by admin and operational.', function (accounts) {
 
@@ -99,11 +98,27 @@ contract('Token funded and stopped by admin and operational.', function (account
         expect(await theToken.balanceOf(user2)).to.be.bignumber.equal(balanceUser1Before);
     });
 
+    it("locked wallets DO NOT have balance until ICO has ended", async function () {
+        expect(await theToken.balanceOf(user2)).to.be.bignumber.not.equal(await theToken.balanceOf(user1));
+        expect(await theToken.balanceOf(expectedNotLocked)).to.be.bignumber.equal(new BigNumber("0"));
+        expect(await theToken.balanceOf(ownerLockedTeam)).to.be.bignumber.equal(new BigNumber("0"));
+        expect(await theToken.balanceOf(ownerLockedDev)).to.be.bignumber.equal(new BigNumber("0"));
+        expect(await theToken.balanceOf(ownerLockedCountry)).to.be.bignumber.equal(new BigNumber("0"));
+    })
+
     it("should accept stopping ICO by admin before ICO timeout.", async function () {
         expect(await theToken.state()).to.be.bignumber.equal(States.Ico);
         await theToken.endICO({ from: expectedStateControl }).should.not.be.rejected;
         expect(await theToken.state()).to.be.bignumber.equal(States.Operational);
     });
+
+    it("locked wallets DO have balance until ICO has ended", async function () {
+        expect(await theToken.balanceOf(user2)).to.be.bignumber.not.equal(await theToken.balanceOf(user1));
+        expect(await theToken.balanceOf(expectedNotLocked)).to.be.bignumber.not.equal(new BigNumber("0"));
+        expect(await theToken.balanceOf(ownerLockedTeam)).to.be.bignumber.not.equal(new BigNumber("0"));
+        expect(await theToken.balanceOf(ownerLockedDev)).to.be.bignumber.not.equal(new BigNumber("0"));
+        expect(await theToken.balanceOf(ownerLockedCountry)).to.be.bignumber.not.equal(new BigNumber("0"));
+    })
 
     it("user2 should be able to transfer his balance back to user1 when Operational.", async function () {
         const balanceUser2Before = await theToken.balanceOf(user2);
@@ -120,4 +135,23 @@ contract('Token funded and stopped by admin and operational.', function (account
         expect(await theToken.balanceOf(user1)).to.be.bignumber.equal(new BigNumber("2"));
         expect(await theToken.balanceOf(user2)).to.be.bignumber.equal(transferBalance);
     });
+
+    it("locked wallets can do transfer", async function () {
+        const expectedNotLockedBalanceBefore = await theToken.balanceOf(expectedNotLocked);
+        const ownerLockedTeamBalanceBefore = await theToken.balanceOf(ownerLockedTeam);
+        const ownerLockedDevBalanceBefore = await theToken.balanceOf(ownerLockedDev);
+        const ownerLockedCountryBalanceBefore = await theToken.balanceOf(ownerLockedCountry);
+
+        const totalLocked = new BigNumber(expectedNotLockedBalanceBefore.toString())
+            .add(new BigNumber(ownerLockedTeamBalanceBefore.toString()))
+            .add(new BigNumber(ownerLockedDevBalanceBefore.toString()))
+            .add(new BigNumber(ownerLockedCountryBalanceBefore.toString()))
+
+        await theToken.transfer(user3, expectedNotLockedBalanceBefore, { from: expectedNotLocked }).should.not.be.rejected;
+        await theToken.transfer(user3, ownerLockedTeamBalanceBefore, { from: ownerLockedTeam }).should.not.be.rejected;
+        await theToken.transfer(user3, ownerLockedDevBalanceBefore, { from: ownerLockedDev }).should.not.be.rejected;
+        await theToken.transfer(user3, ownerLockedCountryBalanceBefore, { from: ownerLockedCountry }).should.not.be.rejected;
+        expect(await theToken.balanceOf(user3)).to.be.bignumber.not.equal(new BigNumber("0"));
+        expect(await theToken.balanceOf(user3)).to.be.bignumber.equal(totalLocked);
+    })
 });

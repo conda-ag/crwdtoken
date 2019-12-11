@@ -6,3 +6,4 @@ coverageEnv
 build/*
 coverage.json
 mnemonic.json
+scTopics

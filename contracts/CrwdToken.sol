@@ -4,8 +4,6 @@ Implements ERC 20 Token standard: https://github.com/ethereum/EIPs/issues/20.
 pragma solidity ^0.5.12;
 
 import "./zeppelin_v1_12_0/StandardToken.sol";
-import "./CrwdTimelock.sol";
-import "./Bonus.sol";
 
 contract CrwdToken is StandardToken {
 
@@ -16,16 +14,16 @@ contract CrwdToken is StandardToken {
         Ico, // whitelist addresses, accept funds, update balances
         Underfunded, // ICO time finished and minimal amount not raised
         Operational, // production phase
-        Paused         // for contract upgrades
+        Paused // for contract upgrades
     }
 
     mapping(address => uint256) public ethPossibleRefunds;
 
     uint256 public soldTokens;
 
-    string public constant name = "Crwdtoken";
+    string public constant name = "CRWDtoken";
 
-    string public constant symbol = "CRWD";
+    string public constant symbol = "CRWT";
 
     uint8 public constant decimals = 18;
 
@@ -70,9 +68,6 @@ contract CrwdToken is StandardToken {
 
     bool public mintingFinished = false;
 
-    bool public bonusPhase = false;
-
-
     //this creates the contract and stores the owner. it also passes in 3 addresses to be used later during the lifetime of the contract.
     constructor(
         address _stateControl,
@@ -96,10 +91,9 @@ contract CrwdToken is StandardToken {
         ETH_CRWDTOKEN = 0;
         totalSupply_ = 0;
         soldTokens = 0;
-        uint releaseTime = now + 9 * 31 days;
-        teamTimeLock = address(new CrwdTimelock(this, _lockedTeam, releaseTime));
-        devTimeLock = address(new CrwdTimelock(this, _lockedDev, releaseTime));
-        countryTimeLock = address(new CrwdTimelock(this, _lockedCountry, releaseTime));
+        teamTimeLock = _lockedTeam;
+        devTimeLock = _lockedDev;
+        countryTimeLock = _lockedCountry;
         miscNotLocked = _notLocked;
     }
 
@@ -108,32 +102,32 @@ contract CrwdToken is StandardToken {
     event StateTransition(States oldState, States newState);
 
     modifier onlyWhitelist() {
-        require(msg.sender == whitelistControl);
+        require(msg.sender == whitelistControl, "only whitelisted wallets");
         _;
     }
 
     modifier onlyStateControl() {
-        require(msg.sender == stateControl);
+        require(msg.sender == stateControl, "only state-controller");
         _;
     }
 
     modifier onlyTokenAssignmentControl() {
-        require(msg.sender == tokenAssignmentControl);
+        require(msg.sender == tokenAssignmentControl, "only assignment controller");
         _;
     }
 
     modifier onlyWithdraw() {
-        require(msg.sender == withdrawControl);
+        require(msg.sender == withdrawControl, "only withdraw controller");
         _;
     }
 
     modifier requireState(States _requiredState) {
-        require(state == _requiredState);
+        require(state == _requiredState, "invalid token state");
         _;
     }
 
     modifier requireAnyOfTwoStates(States _requiredState1, States _requiredState2) {
-        require(state == _requiredState1 || state == _requiredState2);
+        require(state == _requiredState1 || state == _requiredState2, "wrong token state");
         _;
     }
 
@@ -154,9 +148,8 @@ contract CrwdToken is StandardToken {
         require(block.number >= startAcceptingFundsBlock, "startBlock future");
 
         uint256 basisTokens = msg.value.mul(ETH_CRWDTOKEN);
-        uint256 soldToTuserWithBonus = addBonus(basisTokens);
 
-        issueTokensToUser(msg.sender, soldToTuserWithBonus);
+        issueTokensToUser(msg.sender, basisTokens);
         ethPossibleRefunds[msg.sender] = ethPossibleRefunds[msg.sender].add(msg.value);
     }
 
@@ -179,50 +172,13 @@ contract CrwdToken is StandardToken {
         emit Transfer(address(0x0), beneficiary, amount);
     }
 
-    function addBonus(uint256 basisTokens)
-    public view
-    returns (uint256 resultingTokens)
-    {
-        //if pre-sale is not active no bonus calculation
-        if (!bonusPhase) return basisTokens;
-        //percentages are integer numbers as per mill (promille) so we can accurately calculate 0.5% = 5. 100% = 1000
-        uint256 perMillBonus = getPhaseBonus();
-        //no bonus if investment amount < 1000 tokens
-        if (basisTokens >= pointMultiplier.mul(1000)) {
-            perMillBonus += Bonus.getBonusFactor(basisTokens);
-        }
-        //100% + bonus % times original amount divided by 100%.
-        return basisTokens.mul(per_mill + perMillBonus).div(per_mill);
-    }
-
-    uint256 constant per_mill = 1000;
-
-    function setBonusPhase(bool _isBonusPhase)
-    public
-    onlyStateControl
-        //phases are controlled manually through the state control key
-    {
-        bonusPhase = _isBonusPhase;
-    }
-
-    function getPhaseBonus()
-    internal
-    view
-    returns (uint256 factor)
-    {
-        if (bonusPhase) {//20%
-            return 200;
-        }
-        return 0;
-    }
-
-
     function moveToState(States _newState)
     internal
     {
         emit StateTransition(state, _newState);
         state = _newState;
     }
+
     // ICO contract configuration function
     // newEthICOMinimum is the minimum amount of funds to raise
     // newEthICOMaximum is the maximum amount of funds to raise
