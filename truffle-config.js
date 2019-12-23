@@ -60,13 +60,13 @@ module.exports = {
       network_id: 3,
       skipDryRun: true,
     },
-    // live: {
-    //   provider: () => new HDWalletProvider(getMnemonic(), getNode(), 0, 10),
-    //   gas: 5000000,
-    //   gasPrice: 10000000000,
-    //   network_id: 1,
-    //   skipDryRun: true
-    // },
+    live: {
+      provider: () => new HDWalletProvider(getMnemonic(), getNode()),
+      gas: 5000000,
+      gasPrice: 10000000000,
+      network_id: 1,
+      skipDryRun: true
+    },
     coverage: {
       host: "localhost",
       network_id: "*",

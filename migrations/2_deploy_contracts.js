@@ -75,11 +75,11 @@ module.exports = function(deployer, network, account) {
 
     if (network === "live") {
       console.log("used accounts for live deployment");
-      doNotUse = "0xdF184919B16d36180f73F317121B575225cf75f3";
+      doNotUse = "0xe404fb390e0ec81e9b36f99ef4ccf816ba1c7c1f";
       stateControl = "0x6f136A56dD00F89207cBB9D20d32CC493b2C5c2f";
-      whitelistControl = "0x6EdfF8cB294c4cfF0F7BAB32475cCc03C8016C3A";
+      whitelistControl = "0xfb2330a6c58a792b27997481ab7097978adbbdb8";
       withdrawControl = "0x9A1d2f0F3a882E38fbfE4B74d6295576EA866e37";
-      tokenAssignmentControl = "0xD7624aB9a9dB571C04DfA7DB29d734FC286264F6";
+      tokenAssignmentControl = "0xBf72a1F9EDb56188ec69bf790bACAe596A5D1E1b";
       notLocked = "0x3c90233869f9819b925896FC5539D1B4380C04Eb";
       lockedTeam = "0x4EB6716F6fa6ed53C7E6d77AD78BE0630Ee9A397";
       lockedDev = "0xedA8aF69383cB55DB25E8427CCffc43Bf9faEA87";
