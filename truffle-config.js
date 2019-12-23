@@ -53,6 +53,13 @@ module.exports = {
       network_id: 42,
       skipDryRun: true
     },
+    ropsten: {
+      provider: () => new HDWalletProvider(getMnemonic(), getNode(), 0, 1),
+      gas: 5500000,
+      gasPrice: 10000000000,
+      network_id: 3,
+      skipDryRun: true,
+    },
     // live: {
     //   provider: () => new HDWalletProvider(getMnemonic(), getNode(), 0, 10),
     //   gas: 5000000,

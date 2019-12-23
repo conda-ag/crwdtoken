@@ -12,7 +12,7 @@ const UINT128_MAX = new web3.utils.BN("2")
 //
 // Decide if faucet should be assigned
 //
-const assignFaucetOnTestnet = true;
+const assignFaucetOnTestnet = false;
 
 const deployFaucetOnTestnet = async (deployer, network, account) => {
   let faucet = null;
@@ -75,14 +75,15 @@ module.exports = function(deployer, network, account) {
 
     if (network === "live") {
       console.log("used accounts for live deployment");
-      stateControl = "0x2b1039ba7b4d74f9191c7b927731bca2d68dc452";
-      whitelistControl = "0x4b674786aa1f8db532bbeec694669b3ac1fecd1d";
-      withdrawControl = "0x4f0f6b683f7f69bfae06070eef683ea6cd512742";
-      tokenAssignmentControl = "0x5bc58ca727e06b18ebfb2fc19b267c779559b88c";
-      notLocked = "0xffb1b027b11f828dab871ca2956850d5dd64d75f";
-      lockedTeam = "0x28498532576f230c6498cd048ec7fab0f69ce8f9";
-      lockedDev = "0x863d58fa0e4fc8ed0f88146799af5b06feff9e2a";
-      lockedCountry = "0x576ef9cd51d9adb8295f105eeabbb326d1503ff0";
+      doNotUse = "0xdF184919B16d36180f73F317121B575225cf75f3";
+      stateControl = "0x6f136A56dD00F89207cBB9D20d32CC493b2C5c2f";
+      whitelistControl = "0x6EdfF8cB294c4cfF0F7BAB32475cCc03C8016C3A";
+      withdrawControl = "0x9A1d2f0F3a882E38fbfE4B74d6295576EA866e37";
+      tokenAssignmentControl = "0xD7624aB9a9dB571C04DfA7DB29d734FC286264F6";
+      notLocked = "0x3c90233869f9819b925896FC5539D1B4380C04Eb";
+      lockedTeam = "0x4EB6716F6fa6ed53C7E6d77AD78BE0630Ee9A397";
+      lockedDev = "0xedA8aF69383cB55DB25E8427CCffc43Bf9faEA87";
+      lockedCountry = "0x7F2b19a8C6F61F417Ba2ffE8c6f2f9cb3476e2eF";
     } else if (network === "kovan") {
       console.log("used accounts for kovan testnet deployment");
       doNotUse = "0x10cBc8f9262f3717afb50eD6A8f720B60E4B5931";
@@ -94,6 +95,17 @@ module.exports = function(deployer, network, account) {
       lockedTeam = "0xd45EAfD3f28243777b05b001d72E0eB57eE8498d";
       lockedDev = "0xf726C7C75BB52DC83cBB88CEAD9c642394027f38";
       lockedCountry = "0xFb7b93db4ddFF6AD9096da7b4d71D61AEb810A1D";
+    } else if (network === "ropsten") {
+      console.log("used accounts for ropsten testnet deployment");
+      doNotUse = "0xdF184919B16d36180f73F317121B575225cf75f3";
+      stateControl = "0x6f136A56dD00F89207cBB9D20d32CC493b2C5c2f";
+      whitelistControl = "0x6EdfF8cB294c4cfF0F7BAB32475cCc03C8016C3A";
+      withdrawControl = "0x9A1d2f0F3a882E38fbfE4B74d6295576EA866e37";
+      tokenAssignmentControl = "0xD7624aB9a9dB571C04DfA7DB29d734FC286264F6";
+      notLocked = "0x3c90233869f9819b925896FC5539D1B4380C04Eb";
+      lockedTeam = "0x4EB6716F6fa6ed53C7E6d77AD78BE0630Ee9A397";
+      lockedDev = "0xedA8aF69383cB55DB25E8427CCffc43Bf9faEA87";
+      lockedCountry = "0x7F2b19a8C6F61F417Ba2ffE8c6f2f9cb3476e2eF";
     } else if (network === "development" || network === "docker") {
       console.log("used accounts of testrpc/ganache");
       doNotUse = account[0];

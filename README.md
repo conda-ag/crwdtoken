@@ -48,3 +48,7 @@ To flatten the contracts for code verification run:
 `./scripts/flatten_contracts.sh`
 
 It might be required to enter the constructor arguments. You can use this website to get the bytecode from the ABI: https://abi.hashex.org/
+
+## Migrate
+
+truffle migrate --network live

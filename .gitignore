@@ -1,9 +1,9 @@
 node_modules
-mnemonic
+mnemonic*
 coverage
 undefined
 coverageEnv
-build/*
 coverage.json
 mnemonic.json
 scTopics
+package-lock.json

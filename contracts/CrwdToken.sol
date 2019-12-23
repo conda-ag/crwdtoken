@@ -21,7 +21,7 @@ contract CrwdToken is StandardToken {
 
     uint256 public soldTokens;
 
-    string public constant name = "CRWDtoken";
+    string public constant name = "CRWDToken";
 
     string public constant symbol = "CRWT";
 
